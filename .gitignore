@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+build/
+dist/
+*.egg-info/
+*.egg
+
+# Virtual envs
+venv/
+env/
+.venv/
+.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Testing
+.coverage
+.pytest_cache/
+htmlcov/
+
+# Project data
+*.sqlite
+*.sqlite3
+*.db
+reports/*.csv
+reports/*.json
+reports/*.png
+
+# OS
+.DS_Store
+.env
+
+# Local-only planning documents (not part of the coursework deliverable)
+PROJECT_PLAN.md
