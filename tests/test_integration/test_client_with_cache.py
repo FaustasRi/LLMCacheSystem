@@ -47,8 +47,8 @@ class TestClientWithCache(unittest.TestCase):
         provider = MockProvider(model=HAIKU, response="0.5")
         client = TokenFrameClient(provider=provider, cache=_cache())
 
-        client.query("What is sin(30)?")
-        hit = client.query("  please, what is SIN(30)")
+        client.query("Kas yra sin(30)?")
+        hit = client.query("  prašau, kas yra SIN(30)")
         self.assertTrue(hit.cache_hit)
         self.assertEqual(provider.call_count, 1)
 

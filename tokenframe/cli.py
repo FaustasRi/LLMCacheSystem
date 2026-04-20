@@ -1,11 +1,32 @@
-import argparse
+import logging
 import os
+import warnings
+
+# Silence HuggingFace / transformers startup chatter so the CLI's output
+# is not interleaved with library banners. Set before anything transformers-
+# related is imported — those libraries read these env vars at import time.
+os.environ.setdefault("TRANSFORMERS_VERBOSITY", "error")
+os.environ.setdefault("TRANSFORMERS_NO_ADVISORY_WARNINGS", "1")
+os.environ.setdefault("HF_HUB_VERBOSITY", "error")
+os.environ.setdefault("HF_HUB_DISABLE_PROGRESS_BARS", "1")
+warnings.filterwarnings("ignore", category=UserWarning)
+warnings.filterwarnings("ignore", category=FutureWarning)
+# Env vars cover most cases; the hub's unauthenticated-request notice
+# comes through the `huggingface_hub` logger and needs to be quieted
+# at the logger level too.
+logging.getLogger("huggingface_hub").setLevel(logging.ERROR)
+
+import argparse
 import sys
 
+from .cache.base import CacheStrategy
 from .cache.exact import ExactMatchCache
+from .cache.hybrid import HybridCache
+from .cache.semantic import SemanticCache
 from .cache.storage.sqlite import SQLiteStorage
 from .client import TokenFrameClient
 from .config import load_env
+from .embedding.sentence_transformer import SentenceTransformerEmbedder
 from .eviction.lru import LRUEviction
 from .providers.anthropic_provider import AnthropicProvider
 from .providers.mock_provider import MockProvider
@@ -35,6 +56,19 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Enable exact-match cache with SQLite persistence.",
     )
     p.add_argument(
+        "--semantic",
+        action="store_true",
+        help="Enable hybrid cache (exact match, then semantic fallback). "
+             "Implies --cache. First run downloads the embedding model.",
+    )
+    p.add_argument(
+        "--threshold",
+        type=float,
+        default=SemanticCache.DEFAULT_THRESHOLD,
+        help=f"Cosine-similarity threshold for semantic matching "
+             f"(default {SemanticCache.DEFAULT_THRESHOLD}).",
+    )
+    p.add_argument(
         "--cache-db",
         default="./tokenframe_cache.sqlite3",
         help="SQLite file path for the cache (default: ./tokenframe_cache.sqlite3).",
@@ -46,6 +80,24 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Maximum cache entries before LRU eviction kicks in (default: 1000).",
     )
     return p
+
+
+def _build_cache(args) -> CacheStrategy:
+    exact = ExactMatchCache(
+        storage=SQLiteStorage(args.cache_db),
+        eviction=LRUEviction(),
+        max_size=args.cache_size,
+    )
+    if not args.semantic:
+        return exact
+    semantic = SemanticCache(
+        storage=SQLiteStorage(args.cache_db + ".semantic"),
+        eviction=LRUEviction(),
+        embedder=SentenceTransformerEmbedder(),
+        threshold=args.threshold,
+        max_size=args.cache_size,
+    )
+    return HybridCache(exact=exact, semantic=semantic)
 
 
 def main(argv=None) -> int:
@@ -71,19 +123,17 @@ def main(argv=None) -> int:
         provider = AnthropicProvider()
 
     cache = None
-    if args.cache:
-        cache = ExactMatchCache(
-            storage=SQLiteStorage(args.cache_db),
-            eviction=LRUEviction(),
-            max_size=args.cache_size,
-        )
+    cache_enabled = args.cache or args.semantic
+    if cache_enabled:
+        cache = _build_cache(args)
 
     client = TokenFrameClient(provider=provider, cache=cache)
     result = client.query(args.prompt, model=args.model)
 
-    if args.cache:
+    if cache_enabled:
         marker = "HIT" if result.cache_hit else "MISS"
-        print(f"[cache {marker}]")
+        mode = "semantic" if args.semantic else "exact"
+        print(f"[cache {marker} ({mode})]")
 
     print(result.text)
     print()
@@ -96,7 +146,7 @@ def main(argv=None) -> int:
         print(f"  latency:   {result.response.latency_ms:.0f} ms")
     print(f"  cost:      ${result.cost_usd:.6f} USD")
 
-    if args.cache:
+    if cache_enabled:
         report = client.metrics.report()
         print(
             f"  cache:     {report['cache_hits']} hit / "

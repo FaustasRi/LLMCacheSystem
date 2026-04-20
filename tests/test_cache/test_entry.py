@@ -68,6 +68,30 @@ class TestCacheEntry(unittest.TestCase):
         self.assertEqual(e.created_at, 1000.0)
         self.assertAlmostEqual(e.cost_saved_usd, 7 * 0.05)
 
+    def test_embedding_defaults_to_none(self):
+        e = CacheEntry(query="q", response=_resp(), original_cost_usd=0.01)
+        self.assertIsNone(e.embedding)
+
+    def test_embedding_stored_when_provided(self):
+        e = CacheEntry(
+            query="q", response=_resp(),
+            original_cost_usd=0.01,
+            embedding=[0.1, 0.2, 0.3],
+        )
+        self.assertEqual(e.embedding, [0.1, 0.2, 0.3])
+
+    def test_restore_preserves_embedding(self):
+        e = CacheEntry.restore(
+            query="q",
+            response=_resp(),
+            original_cost_usd=0.05,
+            created_at=1.0,
+            hit_count=0,
+            last_accessed_at=1.0,
+            embedding=[0.5, 0.5, 0.5],
+        )
+        self.assertEqual(e.embedding, [0.5, 0.5, 0.5])
+
 
 if __name__ == "__main__":
     unittest.main()

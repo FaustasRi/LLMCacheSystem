@@ -47,9 +47,9 @@ class TestExactMatchCache(unittest.TestCase):
     def test_normalization_is_applied_to_keys(self):
         """Stylistic variants map to one cache key — the whole point of normalization in the cache layer."""
         c = _make_cache()
-        c.put("What is sin(30)?", _resp("0.5"), cost=0.01)
-        self.assertIsNotNone(c.get("what is sin(30)"))
-        self.assertIsNotNone(c.get("  please, WHAT IS sin(30) ?"))
+        c.put("Kas yra sin(30)?", _resp("0.5"), cost=0.01)
+        self.assertIsNotNone(c.get("kas yra sin(30)"))
+        self.assertIsNotNone(c.get("  prašau, KAS YRA sin(30) ?"))
 
     def test_distinct_queries_do_not_collide(self):
         c = _make_cache()

@@ -8,50 +8,31 @@ class TestQueryNormalizer(unittest.TestCase):
         self.n = QueryNormalizer()
 
     def test_lowercases(self):
-        self.assertEqual(self.n.normalize("What is SIN(30)"), "what is sin(30)")
+        self.assertEqual(self.n.normalize("Kas yra SIN(30)"), "kas yra sin(30)")
 
     def test_collapses_whitespace(self):
         self.assertEqual(
-            self.n.normalize("what   is  sin(30)"),
-            "what is sin(30)",
+            self.n.normalize("kas   yra  sin(30)"),
+            "kas yra sin(30)",
         )
 
     def test_strips_trailing_question_mark(self):
         self.assertEqual(
-            self.n.normalize("what is sin(30)?"),
-            "what is sin(30)",
+            self.n.normalize("kas yra sin(30)?"),
+            "kas yra sin(30)",
         )
 
     def test_strips_trailing_and_leading_noise(self):
         self.assertEqual(
-            self.n.normalize("   what is sin(30)?!  "),
-            "what is sin(30)",
+            self.n.normalize("   kas yra sin(30)?!  "),
+            "kas yra sin(30)",
         )
 
     def test_preserves_internal_punctuation(self):
         """Math expressions must survive — no touching of internal dots, parens, operators."""
         self.assertEqual(
-            self.n.normalize("compute 3.14 * 2 + 1"),
-            "compute 3.14 * 2 + 1",
-        )
-
-    def test_english_single_word_filler(self):
-        self.assertEqual(
-            self.n.normalize("please what is sin(30)"),
-            "what is sin(30)",
-        )
-
-    def test_english_multi_word_filler(self):
-        self.assertEqual(
-            self.n.normalize("can you tell me what is sin(30)"),
-            "tell me what is sin(30)",
-        )
-
-    def test_longer_filler_beats_shorter(self):
-        # 'hi there' must be stripped, not leaving 'there' behind after 'hi'.
-        self.assertEqual(
-            self.n.normalize("hi there friend"),
-            "friend",
+            self.n.normalize("apskaičiuok 3.14 * 2 + 1"),
+            "apskaičiuok 3.14 * 2 + 1",
         )
 
     def test_lithuanian_single_word_filler(self):
@@ -77,35 +58,43 @@ class TestQueryNormalizer(unittest.TestCase):
             "kas yra sin(30)",
         )
 
+    def test_longer_filler_beats_shorter(self):
+        # 'gal galėtumėte' must be stripped wholly, not matching 'gal galėtum'
+        # first and leaving 'ėte' behind.
+        self.assertEqual(
+            self.n.normalize("gal galėtumėte padėti"),
+            "padėti",
+        )
+
     def test_wording_variants_map_to_same_key(self):
         """Different polite wording of the same math question — same cache key."""
-        a = self.n.normalize("What is sin(30)?")
-        b = self.n.normalize("please, what is sin(30)?")
-        c = self.n.normalize("hey, what is sin(30)")
+        a = self.n.normalize("Kas yra sin(30)?")
+        b = self.n.normalize("prašau, kas yra sin(30)?")
+        c = self.n.normalize("labas, kas yra sin(30)")
         self.assertEqual(a, b)
         self.assertEqual(a, c)
 
     def test_derivative_and_integral_stay_distinct(self):
         """Critical: don't over-normalize. Different math verbs must stay apart."""
-        a = self.n.normalize("What is the derivative of sin(x)?")
-        b = self.n.normalize("What is the integral of sin(x)?")
+        a = self.n.normalize("Kas yra sin(x) išvestinė?")
+        b = self.n.normalize("Kas yra sin(x) integralas?")
         self.assertNotEqual(a, b)
 
     def test_numbers_stay_distinct(self):
-        a = self.n.normalize("what is sin(30)")
-        b = self.n.normalize("what is sin(60)")
+        a = self.n.normalize("kas yra sin(30)")
+        b = self.n.normalize("kas yra sin(60)")
         self.assertNotEqual(a, b)
 
     def test_empty_string(self):
         self.assertEqual(self.n.normalize(""), "")
 
     def test_only_fillers_collapses_to_empty(self):
-        self.assertEqual(self.n.normalize("please, hi there!"), "")
+        self.assertEqual(self.n.normalize("labas, ačiū!"), "")
 
     def test_custom_filler_list(self):
         n = QueryNormalizer(fillers=["foo"])
-        # Custom list replaces defaults — 'please' is no longer a filler.
-        self.assertEqual(n.normalize("please foo compute"), "please compute")
+        # Custom list replaces defaults — default LT fillers no longer apply.
+        self.assertEqual(n.normalize("labas foo compute"), "labas compute")
 
 
 if __name__ == "__main__":

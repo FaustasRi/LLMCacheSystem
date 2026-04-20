@@ -21,11 +21,13 @@ class CacheEntry:
         original_cost_usd: float,
         *,
         created_at: Optional[float] = None,
+        embedding: Optional[list[float]] = None,
     ):
         self.query = query
         self.response = response
         self.original_cost_usd = original_cost_usd
         self.created_at = created_at if created_at is not None else time.time()
+        self.embedding = embedding
         self._hit_count = 0
         self._last_accessed_at = self.created_at
 
@@ -56,6 +58,7 @@ class CacheEntry:
         created_at: float,
         hit_count: int,
         last_accessed_at: float,
+        embedding: Optional[list[float]] = None,
     ) -> "CacheEntry":
         """Reconstruct an entry from persistent storage with its prior state intact."""
         entry = cls(
@@ -63,6 +66,7 @@ class CacheEntry:
             response=response,
             original_cost_usd=original_cost_usd,
             created_at=created_at,
+            embedding=embedding,
         )
         entry._hit_count = hit_count
         entry._last_accessed_at = last_accessed_at

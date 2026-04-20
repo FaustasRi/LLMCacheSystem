@@ -3,7 +3,7 @@ import os
 import tempfile
 import unittest
 from contextlib import redirect_stderr, redirect_stdout
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 from tokenframe.cli import main
 
@@ -67,7 +67,7 @@ class TestCliWithCache(unittest.TestCase):
         text = self._run([
             "--mock", "--cache", "--cache-db", self.db_path, "q1",
         ])
-        self.assertIn("[cache MISS]", text)
+        self.assertIn("[cache MISS (exact)]", text)
 
     def test_second_call_shows_hit(self):
         self._run([
@@ -76,7 +76,7 @@ class TestCliWithCache(unittest.TestCase):
         text = self._run([
             "--mock", "--cache", "--cache-db", self.db_path, "q1",
         ])
-        self.assertIn("[cache HIT]", text)
+        self.assertIn("[cache HIT (exact)]", text)
 
     def test_cache_summary_line_printed(self):
         text = self._run([
@@ -87,6 +87,49 @@ class TestCliWithCache(unittest.TestCase):
     def test_no_cache_line_without_flag(self):
         text = self._run(["--mock", "q1"])
         self.assertNotIn("[cache", text)
+
+
+class TestCliWithSemantic(unittest.TestCase):
+    def setUp(self):
+        fd, self.db_path = tempfile.mkstemp(suffix=".sqlite3")
+        os.close(fd)
+        os.remove(self.db_path)
+
+    def tearDown(self):
+        for path in (self.db_path, self.db_path + ".semantic"):
+            if os.path.exists(path):
+                os.remove(path)
+
+    def _fake_embedder_class(self):
+        """A MagicMock embedder class so --semantic does not download a real model."""
+        instance = MagicMock()
+        instance.embed.return_value = [0.1, 0.2, 0.3, 0.4]
+        cls = MagicMock(return_value=instance)
+        return cls
+
+    def _run(self, argv) -> str:
+        out = io.StringIO()
+        with patch("tokenframe.cli.SentenceTransformerEmbedder",
+                   self._fake_embedder_class()):
+            with redirect_stdout(out):
+                rc = main(argv)
+        self.assertEqual(rc, 0)
+        return out.getvalue()
+
+    def test_first_semantic_call_shows_miss_and_mode(self):
+        text = self._run([
+            "--mock", "--semantic", "--cache-db", self.db_path, "q1",
+        ])
+        self.assertIn("[cache MISS (semantic)]", text)
+
+    def test_second_semantic_call_shows_hit(self):
+        self._run([
+            "--mock", "--semantic", "--cache-db", self.db_path, "q1",
+        ])
+        text = self._run([
+            "--mock", "--semantic", "--cache-db", self.db_path, "q1",
+        ])
+        self.assertIn("[cache HIT (semantic)]", text)
 
 
 if __name__ == "__main__":

@@ -95,6 +95,89 @@ class TestSQLiteStorage(unittest.TestCase):
         self.assertEqual(loaded.hit_count, 2)
         self.assertAlmostEqual(loaded.original_cost_usd, 0.5)
 
+    def test_embedding_round_trips(self):
+        s = SQLiteStorage(self.path)
+        e = CacheEntry(
+            query="q",
+            response=Response(
+                text="t", model="m", input_tokens=1, output_tokens=1,
+            ),
+            original_cost_usd=0.01,
+            embedding=[0.1, 0.2, 0.3, 0.4],
+        )
+        s.write("q", e)
+        loaded = s.read("q")
+        self.assertEqual(loaded.embedding, [0.1, 0.2, 0.3, 0.4])
+
+    def test_entry_without_embedding_round_trips(self):
+        """Exact-match cache entries carry no embedding — null column must survive."""
+        s = SQLiteStorage(self.path)
+        s.write("q", _entry(key="q"))
+        loaded = s.read("q")
+        self.assertIsNone(loaded.embedding)
+
+
+class TestSQLiteStorageMigration(unittest.TestCase):
+    """Phase 2 databases without the embedding column must upgrade cleanly."""
+
+    def setUp(self):
+        fd, self.path = tempfile.mkstemp(suffix=".sqlite3")
+        os.close(fd)
+        os.remove(self.path)
+
+    def tearDown(self):
+        if os.path.exists(self.path):
+            os.remove(self.path)
+
+    def _create_legacy_db(self):
+        """Create a DB using the Phase 2 schema (no embedding column)."""
+        import sqlite3
+        conn = sqlite3.connect(self.path)
+        conn.execute("""
+            CREATE TABLE cache_entries (
+                key TEXT PRIMARY KEY,
+                query TEXT NOT NULL,
+                response_text TEXT NOT NULL,
+                response_model TEXT NOT NULL,
+                response_input_tokens INTEGER NOT NULL,
+                response_output_tokens INTEGER NOT NULL,
+                response_latency_ms REAL,
+                original_cost_usd REAL NOT NULL,
+                created_at REAL NOT NULL,
+                last_accessed_at REAL NOT NULL,
+                hit_count INTEGER NOT NULL
+            )
+        """)
+        conn.execute(
+            """INSERT INTO cache_entries VALUES
+               ('legacy-key', 'legacy-query', 'text', 'model',
+                1, 2, 3.0, 0.01, 1000.0, 1000.0, 0)""",
+        )
+        conn.commit()
+        conn.close()
+
+    def test_opening_legacy_db_adds_embedding_column(self):
+        self._create_legacy_db()
+        storage = SQLiteStorage(self.path)  # should migrate silently
+        loaded = storage.read("legacy-key")
+        self.assertIsNotNone(loaded)
+        self.assertIsNone(loaded.embedding)
+
+    def test_legacy_db_accepts_new_entries_with_embedding(self):
+        self._create_legacy_db()
+        storage = SQLiteStorage(self.path)
+        new_entry = CacheEntry(
+            query="fresh",
+            response=Response(
+                text="t", model="m", input_tokens=1, output_tokens=1,
+            ),
+            original_cost_usd=0.02,
+            embedding=[0.1, 0.2],
+        )
+        storage.write("fresh", new_entry)
+        loaded = storage.read("fresh")
+        self.assertEqual(loaded.embedding, [0.1, 0.2])
+
 
 if __name__ == "__main__":
     unittest.main()
