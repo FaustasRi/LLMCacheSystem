@@ -7,7 +7,7 @@ A Python framework that sits between an application and an LLM provider and redu
 Built in phases. Each phase leaves the system runnable and tested.
 
 - [x] Phase 1 — Foundation: provider abstraction, cost model, basic client, CLI
-- [ ] Phase 2 — Exact-match caching with persistence
+- [x] Phase 2 — Exact-match caching with persistence
 - [ ] Phase 3 — Semantic caching
 - [ ] Phase 4 — ROI-based eviction
 - [ ] Phase 5 — Adaptive model routing
@@ -40,6 +40,11 @@ tokenframe --mock "What is sin 30?"
 
 # Pick a model
 tokenframe --model claude-opus-4-7 "Prove the Pythagorean theorem."
+
+# Enable exact-match caching with SQLite persistence
+tokenframe --cache "What is sin 30?"
+# Second call with the same (or a politely-worded) prompt hits the cache.
+tokenframe --cache "please, what is SIN 30?"
 ```
 
 ### Library

@@ -1,4 +1,6 @@
 import io
+import os
+import tempfile
 import unittest
 from contextlib import redirect_stderr, redirect_stdout
 from unittest.mock import patch
@@ -42,6 +44,49 @@ class TestCli(unittest.TestCase):
         with redirect_stdout(out):
             main(["--mock", "--model", "claude-opus-4-7", "hi"])
         self.assertIn("claude-opus-4-7", out.getvalue())
+
+
+class TestCliWithCache(unittest.TestCase):
+    def setUp(self):
+        fd, self.db_path = tempfile.mkstemp(suffix=".sqlite3")
+        os.close(fd)
+        os.remove(self.db_path)
+
+    def tearDown(self):
+        if os.path.exists(self.db_path):
+            os.remove(self.db_path)
+
+    def _run(self, argv) -> str:
+        out = io.StringIO()
+        with redirect_stdout(out):
+            rc = main(argv)
+        self.assertEqual(rc, 0)
+        return out.getvalue()
+
+    def test_first_call_shows_miss(self):
+        text = self._run([
+            "--mock", "--cache", "--cache-db", self.db_path, "q1",
+        ])
+        self.assertIn("[cache MISS]", text)
+
+    def test_second_call_shows_hit(self):
+        self._run([
+            "--mock", "--cache", "--cache-db", self.db_path, "q1",
+        ])
+        text = self._run([
+            "--mock", "--cache", "--cache-db", self.db_path, "q1",
+        ])
+        self.assertIn("[cache HIT]", text)
+
+    def test_cache_summary_line_printed(self):
+        text = self._run([
+            "--mock", "--cache", "--cache-db", self.db_path, "q1",
+        ])
+        self.assertIn("cache:", text)
+
+    def test_no_cache_line_without_flag(self):
+        text = self._run(["--mock", "q1"])
+        self.assertNotIn("[cache", text)
 
 
 if __name__ == "__main__":

@@ -1,5 +1,6 @@
 import unittest
 
+from tokenframe.cache.entry import CacheEntry
 from tokenframe.economics.metrics import MetricsTracker
 from tokenframe.providers.base import Response
 
@@ -10,6 +11,14 @@ def _resp(model="m", input_tokens=10, output_tokens=20):
         model=model,
         input_tokens=input_tokens,
         output_tokens=output_tokens,
+    )
+
+
+def _entry(original_cost=0.01):
+    return CacheEntry(
+        query="q",
+        response=_resp(),
+        original_cost_usd=original_cost,
     )
 
 
@@ -76,6 +85,55 @@ class TestMetricsTracker(unittest.TestCase):
         m.record(_resp(), cost=0.75)
         self.assertEqual(m.total_calls, 2)
         self.assertAlmostEqual(m.total_cost, 1.0)
+
+
+class TestMetricsTrackerCache(unittest.TestCase):
+    def test_starts_with_no_cache_stats(self):
+        r = MetricsTracker().report()
+        self.assertEqual(r["cache_hits"], 0)
+        self.assertEqual(r["cache_misses"], 0)
+        self.assertEqual(r["cache_hit_rate"], 0.0)
+        self.assertEqual(r["total_cost_saved_usd"], 0.0)
+
+    def test_record_cache_hit_increments_counter_and_savings(self):
+        m = MetricsTracker()
+        m.record_cache_hit(_entry(original_cost=0.02))
+        m.record_cache_hit(_entry(original_cost=0.03))
+        r = m.report()
+        self.assertEqual(r["cache_hits"], 2)
+        self.assertAlmostEqual(r["total_cost_saved_usd"], 0.05)
+
+    def test_record_cache_miss_increments_counter(self):
+        m = MetricsTracker()
+        m.record_cache_miss()
+        m.record_cache_miss()
+        self.assertEqual(m.cache_misses, 2)
+
+    def test_hit_rate_computed_correctly(self):
+        m = MetricsTracker()
+        m.record_cache_miss()
+        m.record_cache_hit(_entry())
+        m.record_cache_hit(_entry())
+        m.record_cache_hit(_entry())
+        # 3 hits / (3 + 1) = 0.75
+        self.assertAlmostEqual(m.report()["cache_hit_rate"], 0.75)
+
+    def test_cache_hit_does_not_touch_api_call_counters(self):
+        m = MetricsTracker()
+        m.record_cache_hit(_entry(original_cost=0.02))
+        r = m.report()
+        self.assertEqual(r["total_calls"], 0)
+        self.assertEqual(r["total_cost_usd"], 0.0)
+
+    def test_reset_clears_cache_stats(self):
+        m = MetricsTracker()
+        m.record_cache_hit(_entry())
+        m.record_cache_miss()
+        m.reset()
+        r = m.report()
+        self.assertEqual(r["cache_hits"], 0)
+        self.assertEqual(r["cache_misses"], 0)
+        self.assertEqual(r["total_cost_saved_usd"], 0.0)
 
 
 if __name__ == "__main__":
