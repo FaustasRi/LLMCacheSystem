@@ -55,7 +55,7 @@ tokenframe --semantic "Kas yra sin 30?"
 tokenframe --semantic "Gal galėtum apskaičiuoti 30 laipsnių sinusą?"
 ```
 
-The default semantic threshold is `0.60`, tuned empirically for paraphrase detection of Lithuanian math questions with the multilingual MiniLM model. Phase 5's benchmark quantifies the precision/recall trade-off at different thresholds.
+The semantic layer combines a cosine-similarity floor with a math-keyword guard. The default threshold is `0.75`, chosen so it catches paraphrases that keep the shared mathematical terms (e.g. "Kas yra sin 30" vs "Apskaičiuok sin 30"); the guard then filters out same-shape queries with different math (e.g. "Kas yra sin 30" vs "Kas yra cos 30", which embed near-identically on the multilingual MiniLM model). Phase 5's benchmark quantifies the precision/recall trade-off.
 
 ### Library
 

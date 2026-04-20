@@ -5,6 +5,10 @@ from .base import CacheStrategy
 from .entry import CacheEntry
 
 
+# Sentinel — same role as in semantic.py. Module-private.
+_DEFAULT_GUARD = object()
+
+
 class HybridCache(CacheStrategy):
     """Two-stage cache: try exact match first, fall back to semantic match.
 
@@ -15,11 +19,25 @@ class HybridCache(CacheStrategy):
 
     Writes go to both sub-caches so a future exact-wording repeat can
     take the fast path and skip embedding.
+
+    The optional `guard` argument is a convenience that mirrors the
+    semantic sub-cache's own guard API: passing guard=None here
+    disables the math-keyword guard on the underlying SemanticCache,
+    while passing a MathKeywordGuard instance installs it. Leaving
+    guard unspecified keeps whatever the semantic sub-cache was
+    constructed with.
     """
 
-    def __init__(self, exact: CacheStrategy, semantic: CacheStrategy):
+    def __init__(
+        self,
+        exact: CacheStrategy,
+        semantic: CacheStrategy,
+        guard=_DEFAULT_GUARD,
+    ):
         self._exact = exact
         self._semantic = semantic
+        if guard is not _DEFAULT_GUARD and hasattr(semantic, "guard"):
+            semantic.guard = guard
 
     def get(self, query: str) -> Optional[CacheEntry]:
         entry = self._exact.get(query)

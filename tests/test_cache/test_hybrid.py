@@ -3,6 +3,7 @@ import unittest
 from tokenframe.cache.base import CacheStrategy
 from tokenframe.cache.exact import ExactMatchCache
 from tokenframe.cache.hybrid import HybridCache
+from tokenframe.cache.math_guard import MathKeywordGuard
 from tokenframe.cache.semantic import SemanticCache
 from tokenframe.cache.storage.memory import MemoryStorage
 from tokenframe.eviction.lru import LRUEviction
@@ -78,6 +79,61 @@ class TestHybridCache(unittest.TestCase):
         h, _, _ = _make_hybrid(mapping=mapping, threshold=0.9)
         h.put("stored", _resp(), cost=0.01)
         self.assertIsNone(h.get("unrelated"))
+
+
+class TestHybridCacheGuard(unittest.TestCase):
+    """HybridCache exposes the same guard default+opt-out as SemanticCache
+    by propagating it onto the semantic sub-cache at construction time."""
+
+    def _hybrid(self, mapping, threshold=0.5, guard_kw=None):
+        """Build a hybrid. guard_kw is a dict of kwargs (empty means use default)."""
+        exact = ExactMatchCache(storage=MemoryStorage(), eviction=LRUEviction())
+        semantic = SemanticCache(
+            storage=MemoryStorage(),
+            eviction=LRUEviction(),
+            embedder=MapEmbedder(mapping),
+            threshold=threshold,
+        )
+        kwargs = guard_kw if guard_kw is not None else {}
+        return HybridCache(exact=exact, semantic=semantic, **kwargs), semantic
+
+    def test_default_guard_rejects_cross_function(self):
+        mapping = {
+            "kas yra sin 30": [1.0, 0.0],
+            "kas yra cos 30": [1.0, 0.0],
+        }
+        h, _ = self._hybrid(mapping=mapping, threshold=0.5)
+        h.put("Kas yra cos 30?", _resp("COS"), cost=0.01)
+        self.assertIsNone(h.get("Kas yra sin 30?"))
+
+    def test_guard_none_propagates_to_semantic(self):
+        """HybridCache(..., guard=None) overrides the semantic sub-cache to disable it."""
+        mapping = {
+            "kas yra sin 30": [1.0, 0.0],
+            "kas yra cos 30": [1.0, 0.0],
+        }
+        h, semantic = self._hybrid(
+            mapping=mapping, threshold=0.5, guard_kw={"guard": None},
+        )
+        self.assertIsNone(semantic.guard)
+        h.put("Kas yra cos 30?", _resp("COS"), cost=0.01)
+        hit = h.get("Kas yra sin 30?")
+        self.assertIsNotNone(hit)
+        self.assertEqual(hit.response.text, "COS")
+
+    def test_unset_guard_leaves_semantic_default_intact(self):
+        """If HybridCache isn't given a guard arg, the semantic sub-cache keeps its own."""
+        mapping = {"kas yra sin 30": [1.0, 0.0]}
+        _, semantic = self._hybrid(mapping=mapping)
+        self.assertIsNotNone(semantic.guard)
+
+    def test_custom_guard_propagates(self):
+        custom = MathKeywordGuard(stems={"foo": "foo_label"})
+        mapping = {"q": [1.0, 0.0]}
+        _, semantic = self._hybrid(
+            mapping=mapping, guard_kw={"guard": custom},
+        )
+        self.assertIs(semantic.guard, custom)
 
 
 if __name__ == "__main__":

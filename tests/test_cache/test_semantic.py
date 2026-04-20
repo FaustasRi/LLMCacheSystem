@@ -1,6 +1,7 @@
 import unittest
 
 from tokenframe.cache.base import CacheStrategy
+from tokenframe.cache.math_guard import MathKeywordGuard
 from tokenframe.cache.semantic import SemanticCache, _cosine
 from tokenframe.cache.storage.memory import MemoryStorage
 from tokenframe.eviction.lru import LRUEviction
@@ -111,7 +112,7 @@ class TestSemanticCache(unittest.TestCase):
             eviction=LRUEviction(),
             embedder=MapEmbedder({}),
         )
-        self.assertAlmostEqual(c.threshold, 0.60)
+        self.assertAlmostEqual(c.threshold, 0.75)
 
     def test_invalid_threshold_rejected(self):
         for bad in (-0.1, 1.5):
@@ -140,6 +141,87 @@ class TestSemanticCache(unittest.TestCase):
         hit = c.get("q")
         self.assertIsNotNone(hit)
         self.assertEqual(hit.response.text, "WITH_EMB")
+
+
+class TestSemanticCacheWithGuard(unittest.TestCase):
+    """The math-keyword guard layer catches sin/cos-style cross-function
+    collisions that the cosine layer alone cannot separate on short
+    Lithuanian queries."""
+
+    def _cache(self, mapping, threshold=0.5, guard=SemanticCache.__init__.__defaults__[-1]):
+        """Construct a SemanticCache; use the same sentinel-guard default as the class."""
+        return SemanticCache(
+            storage=MemoryStorage(),
+            eviction=LRUEviction(),
+            embedder=MapEmbedder(mapping),
+            threshold=threshold,
+            guard=guard,
+        )
+
+    def test_guard_default_is_enabled_instance(self):
+        c = SemanticCache(
+            storage=MemoryStorage(),
+            eviction=LRUEviction(),
+            embedder=MapEmbedder({}),
+        )
+        self.assertIsInstance(c.guard, MathKeywordGuard)
+
+    def test_guard_rejects_cross_function_collision(self):
+        """Identical embeddings for sin / cos queries — guard must veto."""
+        mapping = {
+            "kas yra sin 30": [1.0, 0.0],
+            "kas yra cos 30": [1.0, 0.0],  # intentionally identical
+        }
+        c = self._cache(mapping=mapping, threshold=0.5)
+        c.put("Kas yra cos 30?", _resp("COS"), cost=0.01)
+        self.assertIsNone(c.get("Kas yra sin 30?"))
+
+    def test_guard_none_falls_back_to_pure_cosine(self):
+        mapping = {
+            "kas yra sin 30": [1.0, 0.0],
+            "kas yra cos 30": [1.0, 0.0],
+        }
+        c = SemanticCache(
+            storage=MemoryStorage(),
+            eviction=LRUEviction(),
+            embedder=MapEmbedder(mapping),
+            threshold=0.5,
+            guard=None,  # explicit opt-out
+        )
+        c.put("Kas yra cos 30?", _resp("COS"), cost=0.01)
+        hit = c.get("Kas yra sin 30?")
+        self.assertIsNotNone(hit)
+        self.assertEqual(hit.response.text, "COS")
+
+    def test_guard_allows_real_paraphrase(self):
+        mapping = {
+            "kas yra sin 30": [1.0, 0.0, 0.0],
+            "apskaičiuok sin 30": [0.95, 0.3122, 0.0],  # cos ~0.95
+        }
+        c = self._cache(mapping=mapping, threshold=0.9)
+        c.put("Kas yra sin 30?", _resp("SIN"), cost=0.01)
+        hit = c.get("Apskaičiuok sin 30")
+        self.assertIsNotNone(hit)
+        self.assertEqual(hit.response.text, "SIN")
+
+    def test_guard_falls_through_to_next_candidate(self):
+        """Best cosine match fails guard — next candidate with correct math wins.
+
+        This is the key reason we iterate candidates instead of taking
+        only the single best cosine match: the best match can be wrong
+        for non-cosine reasons.
+        """
+        mapping = {
+            "kas yra sin 30": [1.0, 0.0, 0.0],
+            "kas yra cos 30": [0.99, 0.1411, 0.0],       # cos ~0.99, wrong math
+            "apskaičiuok sin 30": [0.95, 0.3122, 0.0],    # cos ~0.95, right math
+        }
+        c = self._cache(mapping=mapping, threshold=0.9)
+        c.put("Kas yra cos 30?", _resp("COS"), cost=0.01)
+        c.put("Apskaičiuok sin 30", _resp("SIN"), cost=0.01)
+        hit = c.get("Kas yra sin 30?")
+        self.assertIsNotNone(hit)
+        self.assertEqual(hit.response.text, "SIN")
 
 
 if __name__ == "__main__":
