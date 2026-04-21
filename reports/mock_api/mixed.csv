@@ -1,0 +1,5 @@
+config,total_queries,total_api_calls,total_cost_usd,cost_saved_usd,cache_hits,cache_misses,cache_hit_rate,wall_time_seconds
+baseline,500,500,0.16600000,0.00000000,0,0,0.000000,0.0008
+exact,500,109,0.03618800,0.12981200,391,109,0.782000,0.0024
+semantic,500,50,0.01660000,0.14940000,450,50,0.900000,5.1083
+full,500,50,0.01660000,0.14940000,450,50,0.900000,3.9946

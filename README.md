@@ -4,6 +4,40 @@ A Python framework that sits between an application and an LLM provider and redu
 
 **Target workload:** Lithuanian-language math Q&A. The built-in query normalizer strips Lithuanian politeness fillers, and the semantic cache uses a multilingual embedding model calibrated for Lithuanian paraphrases.
 
+---
+
+## Santrauka (LT)
+
+`TokenFrame` — „Python" karkasas, mažinantis LLM API sąnaudas per tikslų ir semantinį užklausų talpyklavimą bei ROI (grąžos iš investicijų) pagrįstą talpyklos įrašų išmetimą. Sistema sukurta kaip baigiamasis OOP projektas ir skirta lietuvių matematikos Q&A darbo srautui (StudyBuddy etalonai).
+
+**Pagrindinės funkcijos:**
+
+- **Tikslus talpyklavimas** — identiškos (po normalizavimo) užklausos aptarnaujamos vietoje, API skambučiai praleidžiami.
+- **Semantinis talpyklavimas** — parafrazės atpažįstamos per daugiakalbį įterpimo modelį (`paraphrase-multilingual-MiniLM-L12-v2`); papildomas `MathKeywordGuard` saugo nuo kryžminių matematinių kolizijų (pvz., `sin 30` vs `cos 30`).
+- **ROI išmetimas** — kai talpykla pilna, pirma išmetami mažiausios ekonominės vertės įrašai, o ne tiesiog seniausi.
+- **Fasada** — visa sudėtinga logika paslėpta už `TokenFrameClient.query(prompt)`.
+
+**Etaloniniai rezultatai (500 užklausų, lietuviški matematikos klausimai):**
+
+| Scenarijus | baseline | exact | semantic | full |
+| --- | --- | --- | --- | --- |
+| exam_week | $0.1660 | $0.0116 (93% ↓) | $0.0073 (96% ↓) | $0.0073 (96% ↓) |
+| mixed | $0.1660 | $0.0362 (78% ↓) | $0.0166 (90% ↓) | $0.0166 (90% ↓) |
+| casual | $0.1660 | $0.0651 (61% ↓) | $0.0236 (86% ↓) | $0.0216 (87% ↓) |
+
+Pilnas aprašymas — [REPORT.md](REPORT.md).
+
+**Įdiegimas ir greitas paleidimas:**
+
+```bash
+pip install -e .
+export ANTHROPIC_API_KEY=sk-ant-...
+tokenframe --semantic "Kas yra sin 30?"
+python -m benchmarks exam_week --output reports/
+```
+
+---
+
 ## Status
 
 Built in phases. Each phase leaves the system runnable and tested.
@@ -12,7 +46,7 @@ Built in phases. Each phase leaves the system runnable and tested.
 - [x] Phase 2 — Exact-match caching with persistence
 - [x] Phase 3 — Semantic caching
 - [x] Phase 4 — ROI-based eviction
-- [ ] Phase 5 — Benchmark suite and report
+- [x] Phase 5 — Benchmark suite and report
 
 ## Install
 
@@ -68,6 +102,22 @@ tokenframe --cache --eviction roi "Kas yra sin 30?"   # value-aware
 - `lru` — drops the entry with the oldest access. Cheap and predictable.
 - `roi` — drops the entry with the lowest `hit_count × original_cost × exp(-age/half_life)`. Retains historically valuable entries even when they've become less recent; unused entries go first. Half-life defaults to 7 days; entries younger than 60s are shielded from eviction to avoid the "inserted then immediately evicted" case.
 
+### Benchmarks
+
+The `benchmarks/` package simulates a StudyBuddy workload and compares four client configurations (baseline, exact, semantic, full) on the same query stream. Three scenarios ship out of the box, each driven by a Zipf distribution over a 50-question × 4-variation Lithuanian math bank:
+
+```bash
+# Run a scenario — writes CSV, JSON, and three PNG charts to reports/
+python -m benchmarks exam_week --output reports/
+
+# Other scenarios
+python -m benchmarks mixed
+python -m benchmarks casual
+
+# Validate mock numbers against a real Haiku run (costs money)
+python -m benchmarks exam_week --real-api --output reports/real_api/
+```
+
 ### Library
 
 ```python
@@ -87,3 +137,9 @@ print(client.metrics.report())
 ```bash
 python -m unittest discover -s tests -v
 ```
+
+Over 250 tests across unit and integration layers. All tests run offline via `MockProvider` and a test-only `MapEmbedder`, so the suite completes in well under a second and requires no network.
+
+## Report
+
+The full coursework report lives in [REPORT.md](REPORT.md) (Lithuanian).
