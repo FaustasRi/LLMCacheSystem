@@ -18,6 +18,7 @@ env/
 .vscode/
 .idea/
 *.swp
+tempCodeRunnerFile.py
 
 # Testing
 .coverage

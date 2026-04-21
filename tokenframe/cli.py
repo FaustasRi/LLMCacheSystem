@@ -27,7 +27,9 @@ from .cache.storage.sqlite import SQLiteStorage
 from .client import TokenFrameClient
 from .config import load_env
 from .embedding.sentence_transformer import SentenceTransformerEmbedder
+from .eviction.base import EvictionPolicy
 from .eviction.lru import LRUEviction
+from .eviction.roi import ROIBasedEviction
 from .providers.anthropic_provider import AnthropicProvider
 from .providers.mock_provider import MockProvider
 
@@ -77,22 +79,34 @@ def _build_parser() -> argparse.ArgumentParser:
         "--cache-size",
         type=int,
         default=1000,
-        help="Maximum cache entries before LRU eviction kicks in (default: 1000).",
+        help="Maximum cache entries before eviction kicks in (default: 1000).",
+    )
+    p.add_argument(
+        "--eviction",
+        choices=["lru", "roi"],
+        default="lru",
+        help="Eviction policy when the cache is full: lru (default) or roi.",
     )
     return p
+
+
+def _make_eviction(args) -> EvictionPolicy:
+    if args.eviction == "roi":
+        return ROIBasedEviction()
+    return LRUEviction()
 
 
 def _build_cache(args) -> CacheStrategy:
     exact = ExactMatchCache(
         storage=SQLiteStorage(args.cache_db),
-        eviction=LRUEviction(),
+        eviction=_make_eviction(args),
         max_size=args.cache_size,
     )
     if not args.semantic:
         return exact
     semantic = SemanticCache(
         storage=SQLiteStorage(args.cache_db + ".semantic"),
-        eviction=LRUEviction(),
+        eviction=_make_eviction(args),
         embedder=SentenceTransformerEmbedder(),
         threshold=args.threshold,
         max_size=args.cache_size,

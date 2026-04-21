@@ -39,7 +39,7 @@ class TestHybridCache(unittest.TestCase):
     def test_exact_hit_takes_precedence(self):
         """Same wording → exact-match path, semantic embedding never needed."""
         mapping = {"what is sin 30": [1.0, 0.0]}
-        h, exact, semantic = _make_hybrid(mapping=mapping, threshold=0.5)
+        h, exact, _ = _make_hybrid(mapping=mapping, threshold=0.5)
         h.put("what is sin 30", _resp("EXACT"), cost=0.01)
         hit = h.get("what is sin 30")
         self.assertEqual(hit.response.text, "EXACT")
@@ -51,7 +51,7 @@ class TestHybridCache(unittest.TestCase):
             "what is sin 30": [1.0, 0.0, 0.0],
             "sine of 30 degrees": [0.95, 0.3122, 0.0],
         }
-        h, exact, semantic = _make_hybrid(mapping=mapping, threshold=0.9)
+        h, _, _ = _make_hybrid(mapping=mapping, threshold=0.9)
         h.put("what is sin 30", _resp("FROM_SEMANTIC"), cost=0.01)
         hit = h.get("sine of 30 degrees")
         self.assertIsNotNone(hit)

@@ -11,9 +11,8 @@ Built in phases. Each phase leaves the system runnable and tested.
 - [x] Phase 1 — Foundation: provider abstraction, cost model, basic client, CLI
 - [x] Phase 2 — Exact-match caching with persistence
 - [x] Phase 3 — Semantic caching
-- [ ] Phase 4 — ROI-based eviction
-- [ ] Phase 5 — Adaptive model routing
-- [ ] Phase 6 — Benchmark suite and report
+- [x] Phase 4 — ROI-based eviction
+- [ ] Phase 5 — Benchmark suite and report
 
 ## Install
 
@@ -56,6 +55,18 @@ tokenframe --semantic "Gal galėtum apskaičiuoti 30 laipsnių sinusą?"
 ```
 
 The semantic layer combines a cosine-similarity floor with a math-keyword guard. The default threshold is `0.75`, chosen so it catches paraphrases that keep the shared mathematical terms (e.g. "Kas yra sin 30" vs "Apskaičiuok sin 30"); the guard then filters out same-shape queries with different math (e.g. "Kas yra sin 30" vs "Kas yra cos 30", which embed near-identically on the multilingual MiniLM model). Phase 5's benchmark quantifies the precision/recall trade-off.
+
+#### Eviction policy
+
+Once the cache is full, something has to go. Two policies ship:
+
+```bash
+tokenframe --cache --eviction lru "Kas yra sin 30?"   # default
+tokenframe --cache --eviction roi "Kas yra sin 30?"   # value-aware
+```
+
+- `lru` — drops the entry with the oldest access. Cheap and predictable.
+- `roi` — drops the entry with the lowest `hit_count × original_cost × exp(-age/half_life)`. Retains historically valuable entries even when they've become less recent; unused entries go first. Half-life defaults to 7 days; entries younger than 60s are shielded from eviction to avoid the "inserted then immediately evicted" case.
 
 ### Library
 
