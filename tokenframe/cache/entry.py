@@ -44,6 +44,17 @@ class CacheEntry:
         return self._last_accessed_at
 
     @property
+    def last_hit_at(self) -> Optional[float]:
+        """Timestamp of the most recent hit, or None if the entry has never been hit.
+
+        Backed by the same field as last_accessed_at, but explicitly
+        distinguishes "never been hit" from "created at this moment"
+        so ROI-based eviction can treat unused entries as having no
+        hit history rather than as fresh accesses.
+        """
+        return self._last_accessed_at if self._hit_count > 0 else None
+
+    @property
     def cost_saved_usd(self) -> float:
         """Cumulative USD avoided by serving this entry from cache instead of calling the provider."""
         return self._hit_count * self.original_cost_usd
