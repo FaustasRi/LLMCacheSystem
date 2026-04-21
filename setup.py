@@ -13,6 +13,9 @@ setup(
     },
     install_requires=[
         "anthropic>=0.25.0",
+        "python-dotenv",
+        "sentence-transformers>=2.2.0",
+        "matplotlib>=3.5.0",
     ],
     entry_points={
         "console_scripts": [

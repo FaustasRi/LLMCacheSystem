@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "language": "lt",
+  "questions": [
+    {
+      "id": 1,
+      "topic": "trig",
+      "difficulty": "simple",
+      "variations": ["Kas yra sin 30?", "Apskaičiuok sin 30"]
+    },
+    {
+      "id": 2,
+      "topic": "algebra",
+      "difficulty": "simple",
+      "variations": ["Išspręsk x+1=2", "Rask x: x+1=2"]
+    },
+    {
+      "id": 3,
+      "topic": "arithmetic",
+      "difficulty": "simple",
+      "variations": ["Kiek yra 2+2?", "Apskaičiuok 2+2"]
+    }
+  ]
+}

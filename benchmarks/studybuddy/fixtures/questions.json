@@ -1,0 +1,314 @@
+{
+  "version": 1,
+  "language": "lt",
+  "grade_level": "10",
+  "note": "Hand-crafted Lithuanian math question bank covering 10th-grade syllabus. 50 canonical questions × 4 wording variations = 200 total queries.",
+  "questions": [
+    {"id": 1, "topic": "trig", "difficulty": "simple", "variations": [
+      "Kas yra sin 30?",
+      "Apskaičiuok sin 30",
+      "Kiek yra sinusas 30 laipsnių?",
+      "Prašau apskaičiuoti sin 30"
+    ]},
+    {"id": 2, "topic": "trig", "difficulty": "simple", "variations": [
+      "Kas yra cos 45?",
+      "Apskaičiuok cos 45",
+      "Kiek yra kosinusas 45 laipsnių?",
+      "Prašau, kiek yra cos 45?"
+    ]},
+    {"id": 3, "topic": "trig", "difficulty": "simple", "variations": [
+      "Kas yra tan 60?",
+      "Apskaičiuok tan 60",
+      "Kiek yra tangentas 60 laipsnių?",
+      "Gal galėtum apskaičiuoti tan 60?"
+    ]},
+    {"id": 4, "topic": "trig", "difficulty": "simple", "variations": [
+      "Kas yra sin 90?",
+      "Apskaičiuok sin 90",
+      "Kiek yra sinusas 90 laipsnių?",
+      "Labas, kiek yra sin 90?"
+    ]},
+    {"id": 5, "topic": "trig", "difficulty": "simple", "variations": [
+      "Kas yra cos 0?",
+      "Apskaičiuok cos 0",
+      "Kiek yra kosinusas 0 laipsnių?",
+      "Prašau, kas yra cos 0?"
+    ]},
+    {"id": 6, "topic": "trig", "difficulty": "simple", "variations": [
+      "Kas yra tan 45?",
+      "Apskaičiuok tan 45",
+      "Kiek yra tangentas 45 laipsnių?",
+      "Gal galėtum pasakyti, kas yra tan 45?"
+    ]},
+    {"id": 7, "topic": "trig", "difficulty": "procedural", "variations": [
+      "Kam lygu sin^2(x) + cos^2(x)?",
+      "Supaprastink sin^2(x) + cos^2(x)",
+      "Kas yra sinuso kvadrato ir kosinuso kvadrato suma?",
+      "Prašau, kiek yra sin^2(x) + cos^2(x)?"
+    ]},
+    {"id": 8, "topic": "trig", "difficulty": "simple", "variations": [
+      "Kas yra sin 60?",
+      "Apskaičiuok sin 60",
+      "Kiek yra sinusas 60 laipsnių?",
+      "Prašau apskaičiuoti sin 60"
+    ]},
+    {"id": 9, "topic": "trig", "difficulty": "simple", "variations": [
+      "Kas yra cos 180?",
+      "Apskaičiuok cos 180",
+      "Kiek yra kosinusas 180 laipsnių?",
+      "Labas, kiek yra cos 180?"
+    ]},
+    {"id": 10, "topic": "trig", "difficulty": "simple", "variations": [
+      "Kas yra tan 30?",
+      "Apskaičiuok tan 30",
+      "Kiek yra tangentas 30 laipsnių?",
+      "Prašau, kas yra tan 30?"
+    ]},
+
+    {"id": 11, "topic": "algebra", "difficulty": "simple", "variations": [
+      "Išspręsk 2x + 5 = 11",
+      "Kam lygus x jei 2x + 5 = 11?",
+      "Rask x: 2x + 5 = 11",
+      "Gal galėtum išspręsti 2x + 5 = 11?"
+    ]},
+    {"id": 12, "topic": "algebra", "difficulty": "simple", "variations": [
+      "Išspręsk x^2 = 9",
+      "Kam lygus x jei x^2 = 9?",
+      "Rask x: x^2 = 9",
+      "Prašau, rask x jei x^2 = 9"
+    ]},
+    {"id": 13, "topic": "algebra", "difficulty": "procedural", "variations": [
+      "Išskleisk daugikliais x^2 - 4",
+      "Faktorizuok x^2 - 4",
+      "Kaip suskaidyti x^2 - 4 daugikliais?",
+      "Prašau, išskleisk x^2 - 4 daugikliais"
+    ]},
+    {"id": 14, "topic": "algebra", "difficulty": "simple", "variations": [
+      "Išskleisk (x+2)^2",
+      "Kam lygu (x+2)^2?",
+      "Apskaičiuok (x+2)^2",
+      "Prašau, išskleisk (x+2)^2"
+    ]},
+    {"id": 15, "topic": "algebra", "difficulty": "simple", "variations": [
+      "Supaprastink 3x + 2x",
+      "Kam lygu 3x + 2x?",
+      "Apskaičiuok 3x + 2x",
+      "Gal galėtum supaprastinti 3x + 2x?"
+    ]},
+    {"id": 16, "topic": "algebra", "difficulty": "simple", "variations": [
+      "Išspręsk |x| = 5",
+      "Kam lygus x jei |x| = 5?",
+      "Rask visus x: |x| = 5",
+      "Prašau, išspręsk |x| = 5"
+    ]},
+    {"id": 17, "topic": "algebra", "difficulty": "procedural", "variations": [
+      "Išspręsk x^2 - 5x + 6 = 0",
+      "Kam lygus x jei x^2 - 5x + 6 = 0?",
+      "Rask x: x^2 - 5x + 6 = 0",
+      "Gal galėtum išspręsti x^2 - 5x + 6 = 0?"
+    ]},
+    {"id": 18, "topic": "algebra", "difficulty": "simple", "variations": [
+      "Išspręsk 3x = 15",
+      "Kam lygus x jei 3x = 15?",
+      "Rask x: 3x = 15",
+      "Prašau, kam lygus x jei 3x = 15?"
+    ]},
+    {"id": 19, "topic": "algebra", "difficulty": "simple", "variations": [
+      "Išskleisk (x-3)(x+3)",
+      "Kam lygu (x-3)(x+3)?",
+      "Apskaičiuok (x-3)(x+3)",
+      "Prašau, išskleisk (x-3)(x+3)"
+    ]},
+    {"id": 20, "topic": "algebra", "difficulty": "simple", "variations": [
+      "Išspręsk 5 - x = 2",
+      "Kam lygus x jei 5 - x = 2?",
+      "Rask x: 5 - x = 2",
+      "Gal galėtum rasti x jei 5 - x = 2?"
+    ]},
+
+    {"id": 21, "topic": "geometry", "difficulty": "simple", "variations": [
+      "Kam lygus apskritimo plotas, kai r = 5?",
+      "Apskaičiuok apskritimo plotą kai spindulys 5",
+      "Koks apskritimo plotas r = 5?",
+      "Labas, apskaičiuok apskritimo plotą r=5"
+    ]},
+    {"id": 22, "topic": "geometry", "difficulty": "procedural", "variations": [
+      "Kam lygi hipotenuzė, kai katetai 3 ir 4?",
+      "Apskaičiuok stačiakampio trikampio hipotenuzę jei a=3, b=4",
+      "Pagal Pitagoro teoremą, kai katetai 3 ir 4, kokia hipotenuzė?",
+      "Prašau apskaičiuoti hipotenuzę, kai a=3 ir b=4"
+    ]},
+    {"id": 23, "topic": "geometry", "difficulty": "simple", "variations": [
+      "Kam lygus kvadrato perimetras, kai kraštinė 4?",
+      "Apskaičiuok kvadrato perimetrą kai kraštinė 4",
+      "Koks kvadrato perimetras, jei kraštinė lygi 4?",
+      "Prašau, apskaičiuok kvadrato perimetrą (kraštinė 4)"
+    ]},
+    {"id": 24, "topic": "geometry", "difficulty": "simple", "variations": [
+      "Kam lygus trikampio plotas, kai pagrindas 10, aukštis 6?",
+      "Apskaičiuok trikampio plotą: pagrindas 10, aukštis 6",
+      "Koks trikampio plotas, jei b=10, h=6?",
+      "Prašau, apskaičiuok trikampio plotą (b=10, h=6)"
+    ]},
+    {"id": 25, "topic": "geometry", "difficulty": "simple", "variations": [
+      "Kam lygus kubo tūris, kai kraštinė 3?",
+      "Apskaičiuok kubo tūrį kai kraštinė 3",
+      "Koks kubo tūris, jei kraštinė 3?",
+      "Prašau, apskaičiuok kubo tūrį, kai kraštinė 3"
+    ]},
+    {"id": 26, "topic": "geometry", "difficulty": "simple", "variations": [
+      "Kam lygus apskritimo ilgis, kai r = 2?",
+      "Apskaičiuok apskritimo ilgį kai r = 2",
+      "Koks apskritimo ilgis, jei spindulys 2?",
+      "Prašau, apskaičiuok apskritimo ilgį (r=2)"
+    ]},
+    {"id": 27, "topic": "geometry", "difficulty": "simple", "variations": [
+      "Kam lygi trikampio vidaus kampų suma?",
+      "Kiek yra trikampio vidaus kampų suma?",
+      "Kokia trikampio vidinių kampų suma?",
+      "Prašau, pasakyk trikampio vidaus kampų sumą"
+    ]},
+    {"id": 28, "topic": "geometry", "difficulty": "simple", "variations": [
+      "Kam lygus stačiakampio plotas, kai kraštinės 4 ir 6?",
+      "Apskaičiuok stačiakampio plotą kai 4x6",
+      "Koks stačiakampio plotas, jei kraštinės 4 ir 6?",
+      "Prašau, apskaičiuok stačiakampio plotą (4x6)"
+    ]},
+
+    {"id": 29, "topic": "arithmetic", "difficulty": "simple", "variations": [
+      "Kiek yra 15 + 27?",
+      "Apskaičiuok 15 + 27",
+      "Kam lygu 15 plius 27?",
+      "Prašau, apskaičiuok 15 + 27"
+    ]},
+    {"id": 30, "topic": "arithmetic", "difficulty": "simple", "variations": [
+      "Kiek yra 12 * 8?",
+      "Apskaičiuok 12 * 8",
+      "Kam lygu 12 kartų 8?",
+      "Prašau, apskaičiuok 12 * 8"
+    ]},
+    {"id": 31, "topic": "arithmetic", "difficulty": "simple", "variations": [
+      "Kiek yra 100 / 4?",
+      "Apskaičiuok 100 / 4",
+      "Kam lygu 100 padalinta iš 4?",
+      "Prašau, apskaičiuok 100 / 4"
+    ]},
+    {"id": 32, "topic": "arithmetic", "difficulty": "simple", "variations": [
+      "Kiek yra 3/4 + 1/2?",
+      "Apskaičiuok 3/4 + 1/2",
+      "Kam lygu trys ketvirtosios plius viena antroji?",
+      "Prašau, apskaičiuok 3/4 + 1/2"
+    ]},
+    {"id": 33, "topic": "arithmetic", "difficulty": "simple", "variations": [
+      "Kiek yra 7^2?",
+      "Apskaičiuok 7^2",
+      "Kam lygu septyni kvadratu?",
+      "Prašau, apskaičiuok 7^2"
+    ]},
+    {"id": 34, "topic": "arithmetic", "difficulty": "simple", "variations": [
+      "Kam lygi kvadratinė šaknis iš 144?",
+      "Apskaičiuok sqrt(144)",
+      "Kiek yra šaknis iš 144?",
+      "Prašau, apskaičiuok kvadratinę šaknį iš 144"
+    ]},
+    {"id": 35, "topic": "arithmetic", "difficulty": "simple", "variations": [
+      "Kiek yra 10% iš 200?",
+      "Apskaičiuok 10% nuo 200",
+      "Kam lygu dešimt procentų nuo 200?",
+      "Prašau, apskaičiuok 10% iš 200"
+    ]},
+    {"id": 36, "topic": "arithmetic", "difficulty": "simple", "variations": [
+      "Kiek yra pusė iš 24?",
+      "Apskaičiuok pusę iš 24",
+      "Kam lygi pusė skaičiaus 24?",
+      "Prašau, apskaičiuok pusę iš 24"
+    ]},
+
+    {"id": 37, "topic": "calculus", "difficulty": "procedural", "variations": [
+      "Kam lygi x^2 išvestinė?",
+      "Apskaičiuok x^2 išvestinę",
+      "Kokia yra x^2 išvestinė?",
+      "Prašau, apskaičiuok x^2 išvestinę"
+    ]},
+    {"id": 38, "topic": "calculus", "difficulty": "procedural", "variations": [
+      "Kam lygi sin(x) išvestinė?",
+      "Apskaičiuok sin(x) išvestinę",
+      "Kokia yra sinuso išvestinė?",
+      "Prašau, apskaičiuok sin(x) išvestinę"
+    ]},
+    {"id": 39, "topic": "calculus", "difficulty": "procedural", "variations": [
+      "Kam lygi riba 1/x, kai x artėja į begalybę?",
+      "Apskaičiuok lim 1/x, kai x artėja prie begalybės",
+      "Kas yra 1/x riba, kai x eina į begalybę?",
+      "Prašau, apskaičiuok ribą 1/x, kai x artėja begalybės"
+    ]},
+    {"id": 40, "topic": "calculus", "difficulty": "procedural", "variations": [
+      "Kam lygi x^3 išvestinė?",
+      "Apskaičiuok x^3 išvestinę",
+      "Kokia yra x kubu išvestinė?",
+      "Prašau, apskaičiuok x^3 išvestinę"
+    ]},
+    {"id": 41, "topic": "calculus", "difficulty": "complex", "variations": [
+      "Kas yra integralas?",
+      "Apibrėžk integralą",
+      "Kaip apibrėžti integralą?",
+      "Prašau, paaiškink, kas yra integralas"
+    ]},
+
+    {"id": 42, "topic": "sequences", "difficulty": "simple", "variations": [
+      "Kam lygi suma 1 + 2 + ... + 10?",
+      "Apskaičiuok sumą nuo 1 iki 10",
+      "Kiek yra 1 + 2 + 3 + ... + 10?",
+      "Prašau, apskaičiuok sumą 1 + 2 + ... + 10"
+    ]},
+    {"id": 43, "topic": "sequences", "difficulty": "simple", "variations": [
+      "Kokie yra pirmieji 5 Fibonačio skaičiai?",
+      "Nurodyk pirmuosius penkis Fibonačio narius",
+      "Kokie yra Fibonačio sekos pirmi 5 nariai?",
+      "Prašau, parašyk 5 pirmuosius Fibonačio skaičius"
+    ]},
+    {"id": 44, "topic": "sequences", "difficulty": "procedural", "variations": [
+      "Kam lygus 5-as aritmetinės progresijos narys, jei a1=3, d=2?",
+      "Apskaičiuok aritmetinės sekos 5-ą narį (a1=3, d=2)",
+      "Kokia yra a5, kai a1=3 ir skirtumas 2?",
+      "Prašau, apskaičiuok 5-ą aritmetinės progresijos narį, a1=3, d=2"
+    ]},
+    {"id": 45, "topic": "sequences", "difficulty": "procedural", "variations": [
+      "Kokios yra 2^n reikšmės, kai n = 1..5?",
+      "Apskaičiuok 2 kėlimo n laipsniu, kai n nuo 1 iki 5",
+      "Kokie yra geometrinės sekos 2^n pirmi 5 nariai?",
+      "Prašau, parašyk 2^n reikšmes kai n=1,2,3,4,5"
+    ]},
+    {"id": 46, "topic": "functions", "difficulty": "simple", "variations": [
+      "Kam lygus f(3), kai f(x) = 2x + 1?",
+      "Apskaičiuok f(3), jei f(x) = 2x + 1",
+      "Kiek yra f(3) jei f(x) = 2x + 1?",
+      "Prašau, apskaičiuok f(3), kai f(x)=2x+1"
+    ]},
+
+    {"id": 47, "topic": "probability", "difficulty": "simple", "variations": [
+      "Kokia tikimybė, kad kauliukas parodys 6?",
+      "Kam lygi tikimybė išmesti 6 kauliuku?",
+      "Kiek yra tikimybė, kad metant kauliuką iškris 6?",
+      "Prašau, kokia tikimybė, kad kauliukas iškris 6?"
+    ]},
+    {"id": 48, "topic": "statistics", "difficulty": "simple", "variations": [
+      "Kam lygus skaičių 5, 10, 15 vidurkis?",
+      "Apskaičiuok 5, 10, 15 aritmetinį vidurkį",
+      "Koks yra trijų skaičių 5, 10, 15 vidurkis?",
+      "Prašau, apskaičiuok vidurkį iš 5, 10, 15"
+    ]},
+    {"id": 49, "topic": "probability", "difficulty": "procedural", "variations": [
+      "Kokia tikimybė gauti du herbus metant monetą 2 kartus?",
+      "Kam lygi tikimybė gauti du herbus iš eilės?",
+      "Apskaičiuok tikimybę dviem monetoms iškristi herbais",
+      "Prašau, kokia tikimybė gauti du herbus metant monetą du kartus?"
+    ]},
+    {"id": 50, "topic": "statistics", "difficulty": "simple", "variations": [
+      "Kam lygi skaičių 3, 5, 7 mediana?",
+      "Apskaičiuok medianą iš 3, 5, 7",
+      "Kokia yra sekos 3, 5, 7 mediana?",
+      "Prašau, kokia yra mediana iš 3, 5, 7?"
+    ]}
+  ]
+}
