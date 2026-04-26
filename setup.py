@@ -9,12 +9,11 @@ setup(
     packages=find_packages(
         exclude=[
             "tests",
-            "tests.*",
-            "benchmarks",
-            "benchmarks.*"]),
+            "tests.*"]),
     include_package_data=True,
     package_data={
         "tokenframe": ["economics/pricing.json"],
+        "benchmarks": ["studybuddy/fixtures/questions.json"],
     },
     install_requires=[
         "anthropic>=0.25.0",

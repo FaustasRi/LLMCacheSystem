@@ -55,7 +55,7 @@ class Reporter:
     ) -> Path:
         path = self._output_dir / f"{scenario}.csv"
         with path.open("w", newline="", encoding="utf-8") as f:
-            writer = csv.writer(f)
+            writer = csv.writer(f, lineterminator="\n")
             writer.writerow([
                 "config", "total_queries", "total_api_calls",
                 "total_cost_usd", "cost_saved_usd",

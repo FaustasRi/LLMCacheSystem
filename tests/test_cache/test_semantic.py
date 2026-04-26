@@ -173,6 +173,24 @@ class TestSemanticCacheWithGuard(unittest.TestCase):
         c.put("Kas yra cos 30?", _resp("COS"), cost=0.01)
         self.assertIsNone(c.get("Kas yra sin 30?"))
 
+    def test_guard_rejects_compact_function_collision(self):
+        mapping = {
+            "kas yra sin30": [1.0, 0.0],
+            "kas yra cos30": [1.0, 0.0],
+        }
+        c = self._cache(mapping=mapping, threshold=0.5)
+        c.put("Kas yra cos30?", _resp("COS"), cost=0.01)
+        self.assertIsNone(c.get("Kas yra sin30?"))
+
+    def test_guard_rejects_geometry_collision(self):
+        mapping = {
+            "trikampio plotas": [1.0, 0.0],
+            "trikampio perimetras": [1.0, 0.0],
+        }
+        c = self._cache(mapping=mapping, threshold=0.5)
+        c.put("Trikampio plotas", _resp("AREA"), cost=0.01)
+        self.assertIsNone(c.get("Trikampio perimetras"))
+
     def test_guard_none_falls_back_to_pure_cosine(self):
         mapping = {
             "kas yra sin 30": [1.0, 0.0],

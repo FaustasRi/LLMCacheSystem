@@ -50,6 +50,23 @@ class TestExactMatchCache(unittest.TestCase):
         self.assertIsNotNone(c.get("kas yra sin(30)"))
         self.assertIsNotNone(c.get("  prašau, KAS YRA sin(30) ?"))
 
+    def test_math_word_variants_map_to_same_key(self):
+        c = _make_cache()
+        c.put("Kiek yr asaknis is dvieju plius 5?", _resp("A"), cost=0.01)
+        hit = c.get("Kiek yra √2 + 5?")
+        self.assertIsNotNone(hit)
+        self.assertEqual(hit.response.text, "A")
+        compact_hit = c.get("Kiek yra √2+5?")
+        self.assertIsNotNone(compact_hit)
+        self.assertEqual(compact_hit.response.text, "A")
+
+    def test_function_parentheses_are_normalized(self):
+        c = _make_cache()
+        c.put("Kas yra sin(30)?", _resp("A"), cost=0.01)
+        hit = c.get("Kas yra sin 30?")
+        self.assertIsNotNone(hit)
+        self.assertEqual(hit.response.text, "A")
+
     def test_distinct_queries_do_not_collide(self):
         c = _make_cache()
         c.put("what is sin(30)", _resp("A"), cost=0.01)

@@ -28,6 +28,17 @@ class TestExtraction(unittest.TestCase):
     def test_extracts_decimal_numbers(self):
         self.assertIn("3.14", self.g.extract("apskaičiuok 3.14 * 2"))
 
+    def test_extracts_decimal_comma_as_decimal_point(self):
+        self.assertIn("3.14", self.g.extract("apskaičiuok 3,14 * 2"))
+
+    def test_extracts_signed_numbers(self):
+        self.assertIn("-30", self.g.extract("sin -30"))
+        self.assertIn("-30", self.g.extract("sin −30"))
+
+    def test_extracts_compact_function_notation(self):
+        self.assertEqual(self.g.extract("sin30"), {"sin", "30"})
+        self.assertEqual(self.g.extract("cos30"), {"cos", "30"})
+
     def test_extracts_derivative_lt(self):
         self.assertIn("derivative", self.g.extract("sin išvestinė"))
 
@@ -60,6 +71,29 @@ class TestAllowsMatch(unittest.TestCase):
 
     def test_different_numbers_rejected(self):
         self.assertFalse(self.g.allows_match("sin 30", "sin 60"))
+
+    def test_signed_number_rejected_from_unsigned(self):
+        self.assertFalse(self.g.allows_match("sin -30", "sin 30"))
+
+    def test_compact_function_collision_rejected(self):
+        self.assertFalse(self.g.allows_match("sin30", "cos30"))
+
+    def test_different_operators_rejected(self):
+        self.assertFalse(
+            self.g.allows_match("sqrt 2 + 5", "sqrt 2 minus 5")
+        )
+
+    def test_spacing_around_operator_does_not_change_match(self):
+        self.assertTrue(self.g.allows_match("2+5", "2 + 5"))
+        self.assertTrue(self.g.allows_match("2-5", "2 - 5"))
+
+    def test_geometry_topics_rejected(self):
+        self.assertFalse(
+            self.g.allows_match(
+                "trikampio plotas",
+                "trikampio perimetras",
+            )
+        )
 
     def test_sin_alone_vs_sin_integral_rejected(self):
         self.assertFalse(self.g.allows_match(

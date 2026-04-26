@@ -45,6 +45,27 @@ class TestCli(unittest.TestCase):
             main(["--mock", "--model", "claude-opus-4-7", "hi"])
         self.assertIn("claude-opus-4-7", out.getvalue())
 
+    def test_unknown_model_pricing_returns_code_2(self):
+        err = io.StringIO()
+        with redirect_stderr(err):
+            rc = main(["--mock", "--model", "unknown-model", "hi"])
+        self.assertEqual(rc, 2)
+        self.assertIn("pricing is not configured", err.getvalue())
+
+    def test_invalid_cache_size_exits_cleanly(self):
+        err = io.StringIO()
+        with redirect_stderr(err):
+            with self.assertRaises(SystemExit):
+                main(["--mock", "--cache-size", "0", "hi"])
+        self.assertIn("must be at least 1", err.getvalue())
+
+    def test_invalid_threshold_exits_cleanly(self):
+        err = io.StringIO()
+        with redirect_stderr(err):
+            with self.assertRaises(SystemExit):
+                main(["--mock", "--semantic", "--threshold", "2", "hi"])
+        self.assertIn("must be between 0 and 1", err.getvalue())
+
 
 class TestCliWithCache(unittest.TestCase):
     def setUp(self):
@@ -75,6 +96,17 @@ class TestCliWithCache(unittest.TestCase):
         ])
         text = self._run([
             "--mock", "--cache", "--cache-db", self.db_path, "q1",
+        ])
+        self.assertIn("[cache HIT (exact)]", text)
+
+    def test_math_word_variant_shows_hit(self):
+        self._run([
+            "--mock", "--cache", "--cache-db", self.db_path,
+            "Kiek yr asaknis is dvieju plius 5?",
+        ])
+        text = self._run([
+            "--mock", "--cache", "--cache-db", self.db_path,
+            "Kiek yra √2 + 5?",
         ])
         self.assertIn("[cache HIT (exact)]", text)
 

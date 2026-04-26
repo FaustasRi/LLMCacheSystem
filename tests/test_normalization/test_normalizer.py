@@ -10,24 +10,24 @@ class TestQueryNormalizer(unittest.TestCase):
     def test_lowercases(self):
         self.assertEqual(
             self.n.normalize("Kas yra SIN(30)"),
-            "kas yra sin(30)")
+            "kas yra sin 30")
 
     def test_collapses_whitespace(self):
         self.assertEqual(
             self.n.normalize("kas   yra  sin(30)"),
-            "kas yra sin(30)",
+            "kas yra sin 30",
         )
 
     def test_strips_trailing_question_mark(self):
         self.assertEqual(
             self.n.normalize("kas yra sin(30)?"),
-            "kas yra sin(30)",
+            "kas yra sin 30",
         )
 
     def test_strips_trailing_and_leading_noise(self):
         self.assertEqual(
             self.n.normalize("   kas yra sin(30)?!  "),
-            "kas yra sin(30)",
+            "kas yra sin 30",
         )
 
     def test_preserves_internal_punctuation(self):
@@ -36,27 +36,33 @@ class TestQueryNormalizer(unittest.TestCase):
             "apskaičiuok 3.14 * 2 + 1",
         )
 
+    def test_decimal_comma_maps_to_decimal_point(self):
+        self.assertEqual(
+            self.n.normalize("apskaičiuok 3,14 * 2"),
+            "apskaičiuok 3.14 * 2",
+        )
+
     def test_lithuanian_single_word_filler(self):
         self.assertEqual(
             self.n.normalize("Labas, kas yra sin(30)?"),
-            "kas yra sin(30)",
+            "kas yra sin 30",
         )
 
     def test_lithuanian_multi_word_filler(self):
         self.assertEqual(
             self.n.normalize("Gal galėtum pasakyti, kas yra sin(30)?"),
-            "pasakyti kas yra sin(30)",
+            "kas yra sin 30",
         )
 
     def test_lithuanian_without_diacritics(self):
 
         self.assertEqual(
             self.n.normalize("aciu, kas yra sin(30)?"),
-            "kas yra sin(30)",
+            "kas yra sin 30",
         )
         self.assertEqual(
             self.n.normalize("ačiū, kas yra sin(30)?"),
-            "kas yra sin(30)",
+            "kas yra sin 30",
         )
 
     def test_longer_filler_beats_shorter(self):
@@ -70,8 +76,10 @@ class TestQueryNormalizer(unittest.TestCase):
         a = self.n.normalize("Kas yra sin(30)?")
         b = self.n.normalize("prašau, kas yra sin(30)?")
         c = self.n.normalize("labas, kas yra sin(30)")
+        d = self.n.normalize("kas yra sin 30")
         self.assertEqual(a, b)
         self.assertEqual(a, c)
+        self.assertEqual(a, d)
 
     def test_derivative_and_integral_stay_distinct(self):
         a = self.n.normalize("Kas yra sin(x) išvestinė?")
@@ -81,6 +89,22 @@ class TestQueryNormalizer(unittest.TestCase):
     def test_numbers_stay_distinct(self):
         a = self.n.normalize("kas yra sin(30)")
         b = self.n.normalize("kas yra sin(60)")
+        self.assertNotEqual(a, b)
+
+    def test_lithuanian_math_words_match_symbols(self):
+        a = self.n.normalize("Kiek yr asaknis is dvieju plius 5?")
+        b = self.n.normalize("Kiek yra √2 + 5?")
+        c = self.n.normalize("Kiek yra √2+5?")
+        d = self.n.normalize("Kiek yra saknis iš dviejų plius penki?")
+
+        self.assertEqual(a, "sqrt 2 + 5")
+        self.assertEqual(a, b)
+        self.assertEqual(a, c)
+        self.assertEqual(a, d)
+
+    def test_lithuanian_math_operators_stay_distinct(self):
+        a = self.n.normalize("Kiek yra √2 + 5?")
+        b = self.n.normalize("Kiek yra √2 minus 5?")
         self.assertNotEqual(a, b)
 
     def test_empty_string(self):

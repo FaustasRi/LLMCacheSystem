@@ -1,6 +1,6 @@
 # TokenFrame
 
-A Python framework that sits between an application and an LLM provider and reduces API cost through intelligent caching, adaptive model routing, and ROI-based eviction.
+A Python framework that sits between an application and an LLM provider and reduces API cost through intelligent caching and ROI-based eviction.
 
 **Target workload:** Lithuanian-language math Q&A. The built-in query normalizer strips Lithuanian politeness fillers, and the semantic cache uses a multilingual embedding model calibrated for Lithuanian paraphrases.
 
@@ -21,9 +21,9 @@ A Python framework that sits between an application and an LLM provider and redu
 
 | Scenarijus | baseline | exact | semantic | full |
 | --- | --- | --- | --- | --- |
-| exam_week | $0.1660 | $0.0116 (93% ↓) | $0.0073 (96% ↓) | $0.0073 (96% ↓) |
-| mixed | $0.1660 | $0.0362 (78% ↓) | $0.0166 (90% ↓) | $0.0166 (90% ↓) |
-| casual | $0.1660 | $0.0651 (61% ↓) | $0.0236 (86% ↓) | $0.0216 (87% ↓) |
+| exam_week | $0.1660 | $0.0113 (93% ↓) | $0.0076 (95% ↓) | $0.0076 (95% ↓) |
+| mixed | $0.1660 | $0.0349 (79% ↓) | $0.0169 (90% ↓) | $0.0169 (90% ↓) |
+| casual | $0.1660 | $0.0644 (61% ↓) | $0.0239 (86% ↓) | $0.0219 (87% ↓) |
 
 Pilnas aprašymas — [REPORT.md](REPORT.md).
 

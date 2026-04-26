@@ -21,6 +21,16 @@ warnings.filterwarnings("ignore", category=FutureWarning)
 logging.getLogger("huggingface_hub").setLevel(logging.ERROR)
 
 
+def _positive_int(value: str) -> int:
+    try:
+        parsed = int(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError("must be an integer") from exc
+    if parsed < 1:
+        raise argparse.ArgumentTypeError("must be at least 1")
+    return parsed
+
+
 def _build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
         prog="python -m benchmarks",
@@ -34,7 +44,7 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Scenario preset (exam_week / mixed / casual).",
     )
     p.add_argument(
-        "--n-queries", type=int, default=None,
+        "--n-queries", type=_positive_int, default=None,
         help="Override the scenario's default query count.",
     )
     p.add_argument(
@@ -42,7 +52,7 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Sampler seed for reproducibility (default: 42).",
     )
     p.add_argument(
-        "--cache-size", type=int, default=50,
+        "--cache-size", type=_positive_int, default=50,
         help="Per-cache capacity — evictions fire above this (default: 50).",
     )
     p.add_argument(

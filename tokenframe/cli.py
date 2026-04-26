@@ -30,6 +30,26 @@ warnings.filterwarnings("ignore", category=FutureWarning)
 logging.getLogger("huggingface_hub").setLevel(logging.ERROR)
 
 
+def _positive_int(value: str) -> int:
+    try:
+        parsed = int(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError("must be an integer") from exc
+    if parsed < 1:
+        raise argparse.ArgumentTypeError("must be at least 1")
+    return parsed
+
+
+def _threshold(value: str) -> float:
+    try:
+        parsed = float(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError("must be a number") from exc
+    if not 0.0 <= parsed <= 1.0:
+        raise argparse.ArgumentTypeError("must be between 0 and 1")
+    return parsed
+
+
 def _build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
         prog="tokenframe",
@@ -64,7 +84,7 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     p.add_argument(
         "--threshold",
-        type=float,
+        type=_threshold,
         default=SemanticCache.DEFAULT_THRESHOLD,
         help=f"Cosine-similarity threshold for semantic matching "
         f"(default {SemanticCache.DEFAULT_THRESHOLD}).",
@@ -79,7 +99,7 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     p.add_argument(
         "--cache-size",
-        type=int,
+        type=_positive_int,
         default=1000,
         help="Maximum cache entries before eviction kicks in (default: 1000).",
     )
@@ -144,7 +164,19 @@ def main(argv=None) -> int:
         cache = _build_cache(args)
 
     client = TokenFrameClient(provider=provider, cache=cache)
-    result = client.query(args.prompt, model=args.model)
+    try:
+        result = client.query(args.prompt, model=args.model)
+    except KeyError:
+        chosen = (
+            args.model
+            or getattr(provider, "_model", None)
+            or getattr(provider, "_default_model", "unknown")
+        )
+        print(
+            f"Error: pricing is not configured for model '{chosen}'.",
+            file=sys.stderr,
+        )
+        return 2
 
     if cache_enabled:
         marker = "HIT" if result.cache_hit else "MISS"

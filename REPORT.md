@@ -230,9 +230,9 @@ Karkase realizuoti keturi skirtingi F I/O tipai:
 ```csv
 config,total_queries,total_api_calls,total_cost_usd,cost_saved_usd,cache_hits,cache_misses,cache_hit_rate
 baseline,500,500,0.16600000,0.00000000,0,0,0.000000
-exact,500,35,0.01162000,0.15438000,465,35,0.930000
-semantic,500,22,0.00730400,0.15869600,478,22,0.956000
-full,500,22,0.00730400,0.15869600,478,22,0.956000
+exact,500,34,0.01128800,0.15471200,466,34,0.932000
+semantic,500,23,0.00763600,0.15836400,477,23,0.954000
+full,500,23,0.00763600,0.15836400,477,23,0.954000
 ```
 
 Tokį CSV galima atidaryti „Excel" arba „Google Sheets" ir iškart braižyti lyginamąsias diagramas.
@@ -290,33 +290,33 @@ Kiekvieno scenarijaus darbo srautą sudaro 500 užklausų; talpyklos talpa — 5
 | Konfigūracija | API skambučiai | Sąnaudos | Sutaupyta | Atitikimo dažnis |
 | --- | --- | --- | --- | --- |
 | baseline | 500 | $0.1660 | $0.0000 | 0.0% |
-| exact | 35 | $0.0116 | $0.1544 | 93.0% |
-| semantic | 22 | $0.0073 | $0.1587 | 95.6% |
-| full | 22 | $0.0073 | $0.1587 | 95.6% |
+| exact | 34 | $0.0113 | $0.1547 | 93.2% |
+| semantic | 23 | $0.0076 | $0.1584 | 95.4% |
+| full | 23 | $0.0076 | $0.1584 | 95.4% |
 
-**Pastebėjimai:** labai koncentruotas srautas — `exact` jau pasiekia 93% atitikimo, o semantinis sluoksnis papildomai sugauna formuluotės variantus, pakeldamas iki 95.6%. Šiame scenarijuje LRU ir ROI daro tuos pačius sprendimus, nes populiariausių klausimų aibė telpa talpykloje be išmetimo.
+**Pastebėjimai:** labai koncentruotas srautas — `exact` jau pasiekia 93.2% atitikimo, o semantinis sluoksnis papildomai sugauna formuluotės variantus, pakeldamas iki 95.4%. Šiame scenarijuje LRU ir ROI daro tuos pačius sprendimus, nes populiariausių klausimų aibė telpa talpykloje be išmetimo.
 
 ### 3.3 Scenarijus: mixed (α=1.5)
 
 | Konfigūracija | API skambučiai | Sąnaudos | Sutaupyta | Atitikimo dažnis |
 | --- | --- | --- | --- | --- |
 | baseline | 500 | $0.1660 | $0.0000 | 0.0% |
-| exact | 109 | $0.0362 | $0.1298 | 78.2% |
-| semantic | 50 | $0.0166 | $0.1494 | 90.0% |
-| full | 50 | $0.0166 | $0.1494 | 90.0% |
+| exact | 105 | $0.0349 | $0.1311 | 79.0% |
+| semantic | 51 | $0.0169 | $0.1491 | 89.8% |
+| full | 51 | $0.0169 | $0.1491 | 89.8% |
 
-**Pastebėjimai:** platesnis srautas — `exact` nebepakanka (78.2%), semantinis sluoksnis pakelia atitikimą iki 90%. LRU ir ROI vis dar duoda identiškus rezultatus.
+**Pastebėjimai:** platesnis srautas — `exact` nebepakanka (79.0%), semantinis sluoksnis pakelia atitikimą iki 89.8%. LRU ir ROI vis dar duoda identiškus rezultatus.
 
 ### 3.4 Scenarijus: casual (α=1.1)
 
 | Konfigūracija | API skambučiai | Sąnaudos | Sutaupyta | Atitikimo dažnis |
 | --- | --- | --- | --- | --- |
 | baseline | 500 | $0.1660 | $0.0000 | 0.0% |
-| exact | 196 | $0.0651 | $0.1009 | 60.8% |
-| semantic | 71 | $0.0236 | $0.1424 | 85.8% |
-| full | 65 | $0.0216 | $0.1444 | **87.0%** |
+| exact | 194 | $0.0644 | $0.1016 | 61.2% |
+| semantic | 72 | $0.0239 | $0.1421 | 85.6% |
+| full | 66 | $0.0219 | $0.1441 | **86.8%** |
 
-**Pastebėjimai:** čia atsiranda **ROI pranašumas**. Esant plačiam srautui ir spaudimui talpyklai, išmetimo sprendimai tampa svarbūs. ROI išmeta mažai panaudotus įrašus, o LRU — seniausiai prisiliestus (net jei jie buvo labai vertingi). `full` konfigūracija atlieka 65 API skambučius vs 71 semantinei (LRU), t.y. 8% mažiau.
+**Pastebėjimai:** čia atsiranda **ROI pranašumas**. Esant plačiam srautui ir spaudimui talpyklai, išmetimo sprendimai tampa svarbūs. ROI išmeta mažai panaudotus įrašus, o LRU — seniausiai prisiliestus (net jei jie buvo labai vertingi). `full` konfigūracija atlieka 66 API skambučius vs 72 semantinei (LRU), t.y. apie 8.3% mažiau.
 
 ### 3.5 LRU vs ROI palyginimas (izoliuotas eksperimentas)
 
@@ -367,8 +367,8 @@ Kad etalono skaičiai (imitacijos) neliktų tik teoriniai, to paties `exam_week`
 Iš trijų scenarijų ir keturių konfigūracijų lenteli matyti:
 
 1. **Egzamino savaitės tipas** (smailus pasiskirstymas): paprasčiausias `exact` jau duoda ~93% atitikimo. Semantinis sluoksnis duoda nedidelį papildomą pranašumą.
-2. **Mišrus tipas**: semantinis sluoksnis pakelia atitikimą ~12 procentinių punktų (78 → 90%).
-3. **Neformalus tipas**: ROI pranašumas pastebimas — ~2 procentiniai punktai virš vien tik semantinio LRU.
+2. **Mišrus tipas**: semantinis sluoksnis pakelia atitikimą ~11 procentinių punktų (79.0 → 89.8%).
+3. **Neformalus tipas**: ROI pranašumas pastebimas — ~1.2 procentinio punkto virš vien tik semantinio LRU.
 
 Didžiausias pelnas — perėjimas **nuo baseline prie kurio nors talpyklos** (~60–95% taupymas). ROI pranašumas virš LRU pasireiškia tik esant talpyklos spaudimui ir plačiai užklausų aibei.
 
@@ -436,9 +436,9 @@ Pradinis planas apėmė platesnę sritį — anglų kalbos užklausas ir adaptyv
 
 Pagal scenarijus ir konfigūracijas:
 
-- **exam_week** (daug pasikartojimų): 93–95.6% pigiau nei baseline.
-- **mixed** (vidutinis pasikartojimų kiekis): 78.2–90% pigiau.
-- **casual** (maža pakartotina): 60.8–87% pigiau. **ROI vs LRU**: +2 procentiniai punktai atitikimo dažniu.
+- **exam_week** (daug pasikartojimų): 93.2–95.4% pigiau nei baseline.
+- **mixed** (vidutinis pasikartojimų kiekis): 79.0–89.8% pigiau.
+- **casual** (maža pakartotina): 61.2–86.8% pigiau. **ROI vs LRU**: +1.2 procentinio punkto atitikimo dažniu.
 - **Izoliuotas LRU vs ROI eksperimentas**: ROI išlaiko aukštos vertės įrašus, kuriuos LRU išmeta dėl laiko.
 - **MathKeywordGuard** apsaugo nuo sin/cos klasės kolizijų, kurias kitaip sukeltų žemas slenkstis mažame daugiakalbiame modelyje.
 
