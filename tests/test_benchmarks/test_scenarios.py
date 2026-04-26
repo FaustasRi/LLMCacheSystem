@@ -26,7 +26,7 @@ class TestScenarios(unittest.TestCase):
         from dataclasses import FrozenInstanceError
         s = SCENARIOS["exam_week"]
         with self.assertRaises(FrozenInstanceError):
-            s.zipf_alpha = 99.0  # type: ignore[misc]
+            s.zipf_alpha = 99.0
 
 
 if __name__ == "__main__":

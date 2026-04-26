@@ -43,7 +43,6 @@ class TestSentenceTransformerEmbedder(unittest.TestCase):
 
 
 class TestMapEmbedderFromHelpers(unittest.TestCase):
-    """Sanity check that the shared test helper satisfies the Embedder contract."""
 
     def test_map_embedder_is_an_embedder(self):
         from tests.helpers import MapEmbedder

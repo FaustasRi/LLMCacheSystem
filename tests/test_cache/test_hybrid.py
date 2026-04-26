@@ -37,13 +37,12 @@ class TestHybridCache(unittest.TestCase):
         self.assertIsNone(h.get("anything"))
 
     def test_exact_hit_takes_precedence(self):
-        """Same wording → exact-match path, semantic embedding never needed."""
         mapping = {"what is sin 30": [1.0, 0.0]}
         h, exact, _ = _make_hybrid(mapping=mapping, threshold=0.5)
         h.put("what is sin 30", _resp("EXACT"), cost=0.01)
         hit = h.get("what is sin 30")
         self.assertEqual(hit.response.text, "EXACT")
-        # The matched entry must be the one in the exact sub-cache.
+
         self.assertEqual(exact.get("what is sin 30").response.text, "EXACT")
 
     def test_falls_back_to_semantic_on_exact_miss(self):
@@ -82,11 +81,8 @@ class TestHybridCache(unittest.TestCase):
 
 
 class TestHybridCacheGuard(unittest.TestCase):
-    """HybridCache exposes the same guard default+opt-out as SemanticCache
-    by propagating it onto the semantic sub-cache at construction time."""
 
     def _hybrid(self, mapping, threshold=0.5, guard_kw=None):
-        """Build a hybrid. guard_kw is a dict of kwargs (empty means use default)."""
         exact = ExactMatchCache(storage=MemoryStorage(), eviction=LRUEviction())
         semantic = SemanticCache(
             storage=MemoryStorage(),
@@ -107,7 +103,6 @@ class TestHybridCacheGuard(unittest.TestCase):
         self.assertIsNone(h.get("Kas yra sin 30?"))
 
     def test_guard_none_propagates_to_semantic(self):
-        """HybridCache(..., guard=None) overrides the semantic sub-cache to disable it."""
         mapping = {
             "kas yra sin 30": [1.0, 0.0],
             "kas yra cos 30": [1.0, 0.0],
@@ -122,7 +117,6 @@ class TestHybridCacheGuard(unittest.TestCase):
         self.assertEqual(hit.response.text, "COS")
 
     def test_unset_guard_leaves_semantic_default_intact(self):
-        """If HybridCache isn't given a guard arg, the semantic sub-cache keeps its own."""
         mapping = {"kas yra sin 30": [1.0, 0.0]}
         _, semantic = self._hybrid(mapping=mapping)
         self.assertIsNotNone(semantic.guard)

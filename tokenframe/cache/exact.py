@@ -9,19 +9,6 @@ from .storage.base import Storage
 
 
 class ExactMatchCache(CacheStrategy):
-    """Matches queries by exact equality after normalization.
-
-    The class orchestrates three collaborators and makes none of the
-    matching, storage, or eviction decisions itself:
-      - QueryNormalizer turns free-form input into a canonical key
-      - Storage holds the actual entries
-      - EvictionPolicy chooses what to drop when capacity is reached
-
-    Because each collaborator sits behind an abstract interface, the
-    cache is reconfigurable at construction time: swap Storage to go
-    from memory to SQLite, swap EvictionPolicy to go from LRU to the
-    Phase 4 ROI policy, swap QueryNormalizer for a different locale.
-    """
 
     def __init__(
         self,
@@ -43,9 +30,8 @@ class ExactMatchCache(CacheStrategy):
         if entry is None:
             return None
         entry.register_hit()
-        # Persist the updated hit count and access time so SQLite-backed
-        # storage keeps them across process restarts. For MemoryStorage
-        # this is effectively a no-op — it already holds the same object.
+
+
         self._storage.write(key, entry)
         return entry
 

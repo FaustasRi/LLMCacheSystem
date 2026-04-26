@@ -10,17 +10,6 @@ from .base import Storage
 
 
 class SQLiteStorage(Storage):
-    """SQLite-backed persistent storage.
-
-    The database file is created on first construction. All operations
-    open a short-lived connection, which keeps the class safe to use
-    from multiple entry points (CLI, tests) without worrying about a
-    long-lived connection going stale.
-
-    When Phase 3 introduced per-entry embeddings, the schema gained an
-    `embedding` column. Existing Phase 2 databases are migrated with an
-    ALTER TABLE the first time they are opened under the new version.
-    """
 
     _SCHEMA = """
     CREATE TABLE IF NOT EXISTS cache_entries (
@@ -43,9 +32,8 @@ class SQLiteStorage(Storage):
         self._db_path = str(db_path)
         with self._open() as conn:
             conn.execute(self._SCHEMA)
-            # Migrate Phase 2 databases: add the embedding column if an
-            # older schema is in place. Swallowing the OperationalError
-            # when the column already exists keeps the init idempotent.
+
+
             try:
                 conn.execute(
                     "ALTER TABLE cache_entries ADD COLUMN embedding TEXT"
@@ -55,7 +43,6 @@ class SQLiteStorage(Storage):
 
     @contextmanager
     def _open(self) -> Iterator[sqlite3.Connection]:
-        """Open a connection, run inside a transaction, then close on exit."""
         conn = sqlite3.connect(self._db_path)
         conn.row_factory = sqlite3.Row
         try:

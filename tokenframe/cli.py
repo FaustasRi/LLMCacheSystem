@@ -2,18 +2,15 @@ import logging
 import os
 import warnings
 
-# Silence HuggingFace / transformers startup chatter so the CLI's output
-# is not interleaved with library banners. Set before anything transformers-
-# related is imported — those libraries read these env vars at import time.
+
 os.environ.setdefault("TRANSFORMERS_VERBOSITY", "error")
 os.environ.setdefault("TRANSFORMERS_NO_ADVISORY_WARNINGS", "1")
 os.environ.setdefault("HF_HUB_VERBOSITY", "error")
 os.environ.setdefault("HF_HUB_DISABLE_PROGRESS_BARS", "1")
 warnings.filterwarnings("ignore", category=UserWarning)
 warnings.filterwarnings("ignore", category=FutureWarning)
-# Env vars cover most cases; the hub's unauthenticated-request notice
-# comes through the `huggingface_hub` logger and needs to be quieted
-# at the logger level too.
+
+
 logging.getLogger("huggingface_hub").setLevel(logging.ERROR)
 
 import argparse

@@ -68,7 +68,7 @@ class TestMetricsTracker(unittest.TestCase):
         m.record(_resp(model="x"), cost=0.5)
         r1 = m.report()
         m.record(_resp(model="x"), cost=0.5)
-        self.assertEqual(r1["total_calls"], 1)  # first report is not mutated
+        self.assertEqual(r1["total_calls"], 1)
 
     def test_reset_clears_all_counters(self):
         m = MetricsTracker()
@@ -115,7 +115,7 @@ class TestMetricsTrackerCache(unittest.TestCase):
         m.record_cache_hit(_entry())
         m.record_cache_hit(_entry())
         m.record_cache_hit(_entry())
-        # 3 hits / (3 + 1) = 0.75
+
         self.assertAlmostEqual(m.report()["cache_hit_rate"], 0.75)
 
     def test_cache_hit_does_not_touch_api_call_counters(self):

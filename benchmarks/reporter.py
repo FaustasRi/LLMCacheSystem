@@ -7,16 +7,13 @@ from typing import Union
 
 import matplotlib
 
-# Headless backend so the reporter works on CI, inside tests, and over SSH
-# sessions with no display. Set before importing pyplot.
+
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt  # noqa: E402
+import matplotlib.pyplot as plt
 
 from .runner import ConfigResult
 
 
-# Colour per config — ordered from "no optimisation" to "fully optimised"
-# so the bars tell a story even without reading labels.
 _CONFIG_COLORS = {
     "baseline": "#999999",
     "exact":    "#5a9bd4",
@@ -30,13 +27,6 @@ def _color_for(name: str) -> str:
 
 
 class Reporter:
-    """Writes benchmark results to CSV, JSON, and matplotlib PNG charts.
-
-    CSV and JSON satisfy the coursework File I/O requirement in its
-    most analytically useful form — the CSV rows are a direct
-    spreadsheet import, and the JSON retains the per-query cumulative
-    timeline that lets a later tool re-render the charts.
-    """
 
     def __init__(self, output_dir: Union[str, Path]):
         self._output_dir = Path(output_dir)
@@ -51,7 +41,6 @@ class Reporter:
         scenario: str,
         results: dict[str, ConfigResult],
     ) -> dict[str, Path]:
-        """Write every artifact for the given scenario + results."""
         return {
             "csv": self.write_csv(scenario, results),
             "json": self.write_json(scenario, results),

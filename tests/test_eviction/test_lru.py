@@ -33,12 +33,11 @@ class TestLRUEviction(unittest.TestCase):
         self.assertIs(LRUEviction().pick_victim([c, a, b]), a)
 
     def test_access_updates_recency(self):
-        # Start with explicit timestamps so there is no timer-resolution ambiguity.
-        # register_hit() uses time.time() which will be much newer than the
-        # hardcoded values, making ordering deterministic.
+
+
         a = _entry("a", created_at=1000.0)
         b = _entry("b", created_at=2000.0)
-        a.register_hit()  # a is now newer than b
+        a.register_hit()
         self.assertIs(LRUEviction().pick_victim([a, b]), b)
 
 

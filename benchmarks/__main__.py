@@ -3,24 +3,22 @@ import os
 import sys
 import warnings
 
-# Silence HuggingFace / transformers startup chatter in benchmark runs too —
-# same rationale as the main CLI. Must be set before sentence-transformers
-# is imported transitively through the configs module.
+
 os.environ.setdefault("TRANSFORMERS_VERBOSITY", "error")
 os.environ.setdefault("TRANSFORMERS_NO_ADVISORY_WARNINGS", "1")
 os.environ.setdefault("HF_HUB_VERBOSITY", "error")
 os.environ.setdefault("HF_HUB_DISABLE_PROGRESS_BARS", "1")
 warnings.filterwarnings("ignore", category=UserWarning)
 warnings.filterwarnings("ignore", category=FutureWarning)
-import logging  # noqa: E402
+import logging
 logging.getLogger("huggingface_hub").setLevel(logging.ERROR)
 
-from .configs import make_factories, mock_provider_factory  # noqa: E402
-from .reporter import Reporter  # noqa: E402
-from .runner import BenchmarkRunner  # noqa: E402
-from .scenarios import SCENARIOS  # noqa: E402
-from .studybuddy.question_bank import QuestionBank  # noqa: E402
-from .studybuddy.simulator import StudentSimulator  # noqa: E402
+from .configs import make_factories, mock_provider_factory
+from .reporter import Reporter
+from .runner import BenchmarkRunner
+from .scenarios import SCENARIOS
+from .studybuddy.question_bank import QuestionBank
+from .studybuddy.simulator import StudentSimulator
 
 
 def _build_parser() -> argparse.ArgumentParser:

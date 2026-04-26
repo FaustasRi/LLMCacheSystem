@@ -45,7 +45,6 @@ class TestExactMatchCache(unittest.TestCase):
         self.assertEqual(again.hit_count, 3)
 
     def test_normalization_is_applied_to_keys(self):
-        """Stylistic variants map to one cache key — the whole point of normalization in the cache layer."""
         c = _make_cache()
         c.put("Kas yra sin(30)?", _resp("0.5"), cost=0.01)
         self.assertIsNotNone(c.get("kas yra sin(30)"))
@@ -68,33 +67,30 @@ class TestExactMatchCache(unittest.TestCase):
     def test_eviction_triggers_when_full(self):
         c = _make_cache(max_size=2)
 
-        # Deterministic clock so LRU ordering does not depend on wall-clock
-        # resolution. Each time.time() call returns a strictly larger value
-        # than the previous, which is all LRU needs.
+
         clock = iter([1000.0 + i for i in range(100)])
 
         with patch("tokenframe.cache.entry.time.time",
                    side_effect=lambda: next(clock)):
             c.put("a", _resp(), cost=0.01)
             c.put("b", _resp(), cost=0.01)
-            # At capacity. Touch 'b' so it becomes most-recent, then insert 'c'.
+
             c.get("b")
             c.put("c", _resp(), cost=0.01)
 
-        # LRU should have evicted 'a' (oldest last_accessed), kept 'b' and 'c'.
+
         self.assertIsNone(c.get("a"))
         self.assertIsNotNone(c.get("b"))
         self.assertIsNotNone(c.get("c"))
         self.assertEqual(len(c), 2)
 
     def test_put_with_existing_key_does_not_evict(self):
-        """Re-putting an existing key overwrites — no capacity pressure, no eviction."""
         c = _make_cache(max_size=2)
         c.put("a", _resp("v1"), cost=0.01)
         c.put("b", _resp(), cost=0.01)
-        c.put("a", _resp("v2"), cost=0.01)  # replace, not insert
+        c.put("a", _resp("v2"), cost=0.01)
         self.assertEqual(c.get("a").response.text, "v2")
-        self.assertIsNotNone(c.get("b"))  # still present
+        self.assertIsNotNone(c.get("b"))
 
     def test_max_size_zero_rejected(self):
         with self.assertRaises(ValueError):

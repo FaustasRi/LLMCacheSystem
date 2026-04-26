@@ -12,8 +12,8 @@ FIXTURE = Path(__file__).parent / "fixtures" / "tiny_questions.json"
 class TestQuestion(unittest.TestCase):
     def test_question_is_immutable(self):
         q = Question(id=1, topic="trig", difficulty="simple", variations=("a",))
-        with self.assertRaises(Exception):  # FrozenInstanceError
-            q.id = 2  # type: ignore[misc]
+        with self.assertRaises(Exception):
+            q.id = 2
 
     def test_question_without_variations_rejected(self):
         with self.assertRaises(ValueError):
@@ -54,7 +54,6 @@ class TestQuestionBank(unittest.TestCase):
             QuestionBank([])
 
     def test_default_fixture_loads(self):
-        """The bundled default fixture must be a valid bank."""
         bank = QuestionBank.default()
         self.assertGreaterEqual(len(bank), 1)
         for q in bank:

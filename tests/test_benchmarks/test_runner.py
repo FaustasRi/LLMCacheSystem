@@ -30,15 +30,14 @@ class TestBenchmarkRunner(unittest.TestCase):
             self.assertEqual(result.total_queries, 3, msg=name)
 
     def test_baseline_makes_one_api_call_per_query(self):
-        r = self._runner(["q1"] * 10)  # 10 identical queries
+        r = self._runner(["q1"] * 10)
         results = r.run(self._factories())
         self.assertEqual(results["baseline"].total_api_calls, 10)
-        # Exact cache: one API call, nine hits
+
         self.assertEqual(results["exact"].total_api_calls, 1)
         self.assertEqual(results["exact"].cache_hits, 9)
 
     def test_baseline_cost_at_least_as_high_as_cached(self):
-        """Baseline pays for every call; exact-cache path skips duplicates."""
         r = self._runner(["q"] * 5)
         results = r.run(self._factories())
         self.assertGreater(

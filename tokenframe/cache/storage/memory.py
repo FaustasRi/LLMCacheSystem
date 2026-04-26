@@ -5,7 +5,6 @@ from .base import Storage
 
 
 class MemoryStorage(Storage):
-    """In-memory dict-backed storage. Not persistent — entries vanish with the process."""
 
     def __init__(self):
         self._store: dict[str, CacheEntry] = {}

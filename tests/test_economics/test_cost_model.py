@@ -35,7 +35,7 @@ class TestCostModel(unittest.TestCase):
             "test-model": {"input": 1.0, "output": 2.0}
         })
         cm = CostModel(pricing_path=path)
-        # 1000 input at $1/M + 2000 output at $2/M = 0.001 + 0.004
+
         cost = cm.estimate("test-model", 1000, 2000)
         self.assertAlmostEqual(cost, 0.005)
 

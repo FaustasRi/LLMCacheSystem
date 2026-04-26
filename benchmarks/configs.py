@@ -23,13 +23,6 @@ ClientFactory = Callable[[], TokenFrameClient]
 
 
 def mock_provider_factory() -> ProviderFactory:
-    """Return a factory that produces fresh MockProviders.
-
-    Each config gets its own MockProvider instance so per-config
-    call_count is isolated. Token counts are fixed at realistic LT
-    math Q&A averages — not exact, but the relative comparison
-    across configs is what matters for the cost narrative.
-    """
     def factory() -> Provider:
         return MockProvider(
             response="[benchmark mock response]",
@@ -46,18 +39,7 @@ def make_factories(
     embedder: Optional[Embedder] = None,
     cache_size: int = DEFAULT_CACHE_SIZE,
 ) -> dict[str, ClientFactory]:
-    """Build the four-config factory dict for a benchmark run.
 
-    - baseline: no cache
-    - exact:    ExactMatchCache + LRU
-    - semantic: HybridCache + LRU
-    - full:     HybridCache + ROI eviction
-
-    The embedder is optional; if absent, semantic and full configs
-    lazily construct a SentenceTransformerEmbedder on first need.
-    Tests pass a MapEmbedder so they stay offline.
-    """
-    # Shared embedder across semantic and full so the model loads once.
     _cached_embedder: list[Optional[Embedder]] = [embedder]
 
     def _get_embedder() -> Embedder:

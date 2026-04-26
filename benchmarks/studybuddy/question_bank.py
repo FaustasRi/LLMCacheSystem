@@ -6,12 +6,6 @@ from typing import Iterator, Union
 
 @dataclass(frozen=True)
 class Question:
-    """A single canonical math question plus its wording variations.
-
-    Variations are stored as a tuple (not a list) so Question remains
-    hashable and immutable — useful when simulator tests want to compare
-    picked questions by identity.
-    """
     id: int
     topic: str
     difficulty: str
@@ -25,11 +19,6 @@ class Question:
 
 
 class QuestionBank:
-    """Loaded-from-JSON collection of Question records.
-
-    The bank is an ordered, iterable container — the simulator relies on
-    the rank-ordering to apply Zipf weights (most popular = first).
-    """
 
     def __init__(self, questions: list[Question]):
         if not questions:
@@ -52,7 +41,6 @@ class QuestionBank:
 
     @classmethod
     def default(cls) -> "QuestionBank":
-        """Load the bundled questions.json fixture."""
         path = Path(__file__).parent / "fixtures" / "questions.json"
         return cls.from_json(path)
 

@@ -31,7 +31,7 @@ class TestMemoryStorage(unittest.TestCase):
         s = MemoryStorage()
         e = _entry(key="q1")
         s.write("q1", e)
-        self.assertIs(s.read("q1"), e)  # identity: same object in memory
+        self.assertIs(s.read("q1"), e)
 
     def test_delete_removes_entry(self):
         s = MemoryStorage()

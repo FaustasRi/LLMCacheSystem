@@ -51,7 +51,7 @@ class TestSemanticCache(unittest.TestCase):
     def test_near_duplicate_queries_hit(self):
         mapping = {
             "what is sin 30": [1.0, 0.0, 0.0],
-            "sine of 30 degrees": [0.95, 0.3122, 0.0],  # cos ~0.95 with [1,0,0]
+            "sine of 30 degrees": [0.95, 0.3122, 0.0],
         }
         c = self._cache(mapping=mapping, threshold=0.9)
         c.put("what is sin 30", _resp("0.5"), cost=0.01)
@@ -62,7 +62,7 @@ class TestSemanticCache(unittest.TestCase):
     def test_distant_queries_miss(self):
         mapping = {
             "q1": [1.0, 0.0, 0.0],
-            "totally different": [0.0, 1.0, 0.0],  # orthogonal → cos=0
+            "totally different": [0.0, 1.0, 0.0],
         }
         c = self._cache(mapping=mapping, threshold=0.5)
         c.put("q1", _resp(), cost=0.01)
@@ -71,7 +71,7 @@ class TestSemanticCache(unittest.TestCase):
     def test_threshold_controls_hit_or_miss(self):
         mapping = {
             "stored": [1.0, 0.0, 0.0],
-            "close": [0.9, 0.4359, 0.0],  # cos ~0.9 with [1,0,0]
+            "close": [0.9, 0.4359, 0.0],
         }
         lenient = self._cache(mapping=mapping, threshold=0.85)
         lenient.put("stored", _resp(), cost=0.01)
@@ -102,7 +102,7 @@ class TestSemanticCache(unittest.TestCase):
         c = self._cache(mapping=mapping, threshold=0.9)
         c.put("stored", _resp(), cost=0.01)
         c.get("similar")
-        # Access the same matched entry again by its stored key.
+
         second = c.get("similar")
         self.assertEqual(second.hit_count, 2)
 
@@ -125,17 +125,16 @@ class TestSemanticCache(unittest.TestCase):
                 )
 
     def test_entry_without_embedding_is_ignored_during_search(self):
-        """Stored entries without embeddings (e.g., from ExactMatchCache) don't confuse semantic search."""
         mapping = {"q": [1.0, 0.0]}
         c = self._cache(mapping=mapping, threshold=0.9)
 
-        # Write a dangling no-embedding entry directly into storage.
+
         from tokenframe.cache.entry import CacheEntry
         c._storage.write(
             "no-embed",
             CacheEntry(query="no-embed", response=_resp(), original_cost_usd=0.01),
         )
-        # Real put with embedding
+
         c.put("q", _resp("WITH_EMB"), cost=0.01)
 
         hit = c.get("q")
@@ -144,12 +143,8 @@ class TestSemanticCache(unittest.TestCase):
 
 
 class TestSemanticCacheWithGuard(unittest.TestCase):
-    """The math-keyword guard layer catches sin/cos-style cross-function
-    collisions that the cosine layer alone cannot separate on short
-    Lithuanian queries."""
 
     def _cache(self, mapping, threshold=0.5, guard=SemanticCache.__init__.__defaults__[-1]):
-        """Construct a SemanticCache; use the same sentinel-guard default as the class."""
         return SemanticCache(
             storage=MemoryStorage(),
             eviction=LRUEviction(),
@@ -167,10 +162,9 @@ class TestSemanticCacheWithGuard(unittest.TestCase):
         self.assertIsInstance(c.guard, MathKeywordGuard)
 
     def test_guard_rejects_cross_function_collision(self):
-        """Identical embeddings for sin / cos queries — guard must veto."""
         mapping = {
             "kas yra sin 30": [1.0, 0.0],
-            "kas yra cos 30": [1.0, 0.0],  # intentionally identical
+            "kas yra cos 30": [1.0, 0.0],
         }
         c = self._cache(mapping=mapping, threshold=0.5)
         c.put("Kas yra cos 30?", _resp("COS"), cost=0.01)
@@ -186,7 +180,7 @@ class TestSemanticCacheWithGuard(unittest.TestCase):
             eviction=LRUEviction(),
             embedder=MapEmbedder(mapping),
             threshold=0.5,
-            guard=None,  # explicit opt-out
+            guard=None,
         )
         c.put("Kas yra cos 30?", _resp("COS"), cost=0.01)
         hit = c.get("Kas yra sin 30?")
@@ -196,7 +190,7 @@ class TestSemanticCacheWithGuard(unittest.TestCase):
     def test_guard_allows_real_paraphrase(self):
         mapping = {
             "kas yra sin 30": [1.0, 0.0, 0.0],
-            "apskaičiuok sin 30": [0.95, 0.3122, 0.0],  # cos ~0.95
+            "apskaičiuok sin 30": [0.95, 0.3122, 0.0],
         }
         c = self._cache(mapping=mapping, threshold=0.9)
         c.put("Kas yra sin 30?", _resp("SIN"), cost=0.01)
@@ -205,16 +199,10 @@ class TestSemanticCacheWithGuard(unittest.TestCase):
         self.assertEqual(hit.response.text, "SIN")
 
     def test_guard_falls_through_to_next_candidate(self):
-        """Best cosine match fails guard — next candidate with correct math wins.
-
-        This is the key reason we iterate candidates instead of taking
-        only the single best cosine match: the best match can be wrong
-        for non-cosine reasons.
-        """
         mapping = {
             "kas yra sin 30": [1.0, 0.0, 0.0],
-            "kas yra cos 30": [0.99, 0.1411, 0.0],       # cos ~0.99, wrong math
-            "apskaičiuok sin 30": [0.95, 0.3122, 0.0],    # cos ~0.95, right math
+            "kas yra cos 30": [0.99, 0.1411, 0.0],
+            "apskaičiuok sin 30": [0.95, 0.3122, 0.0],
         }
         c = self._cache(mapping=mapping, threshold=0.9)
         c.put("Kas yra cos 30?", _resp("COS"), cost=0.01)

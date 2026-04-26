@@ -35,7 +35,7 @@ class TestConfigs(unittest.TestCase):
     def test_baseline_has_no_cache(self):
         f = self._factories()
         client = f["baseline"]()
-        # Internal attribute, but this is precisely what the factory contract guarantees.
+
         self.assertIsNone(client._cache)
 
     def test_exact_has_cache(self):

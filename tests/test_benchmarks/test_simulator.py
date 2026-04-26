@@ -53,7 +53,6 @@ class TestStudentSimulator(unittest.TestCase):
             self.assertIn(query, allowed)
 
     def test_high_alpha_concentrates_picks_on_first_question(self):
-        """With a steep Zipf (alpha=4), the top question should dominate."""
         bank = _bank()
         sim = StudentSimulator(bank=bank, zipf_alpha=4.0, seed=0)
         queries = sim.generate(1000)
@@ -62,7 +61,6 @@ class TestStudentSimulator(unittest.TestCase):
         self.assertGreater(fraction_top, 0.9)
 
     def test_low_alpha_spreads_across_bank(self):
-        """With alpha near 1 and a small bank, every question should appear."""
         bank = _bank()
         sim = StudentSimulator(bank=bank, zipf_alpha=1.0, seed=0)
         queries = sim.generate(500)
@@ -75,7 +73,6 @@ class TestStudentSimulator(unittest.TestCase):
         self.assertEqual(seen_ids, {1, 2, 3})
 
     def test_variants_of_same_question_do_appear(self):
-        """Over a large sample, all variations of the top question should show up at least once."""
         bank = _bank()
         sim = StudentSimulator(bank=bank, zipf_alpha=1.5, seed=0)
         queries = sim.generate(1000)

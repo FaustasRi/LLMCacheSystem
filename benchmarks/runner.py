@@ -10,12 +10,6 @@ ClientFactory = Callable[[], TokenFrameClient]
 
 @dataclass
 class ConfigResult:
-    """Per-configuration outcome of a benchmark run.
-
-    cumulative_cost_timeline records cost-so-far after each query so
-    the reporter can draw a line chart showing how cost accrues
-    through the session for each config.
-    """
     config_name: str
     total_queries: int
     total_api_calls: int
@@ -29,13 +23,6 @@ class ConfigResult:
 
 
 class BenchmarkRunner:
-    """Runs a fixed workload through multiple client configurations.
-
-    The runner does not build clients — it accepts zero-arg factories
-    so each config gets a fresh, isolated client. The workload is
-    identical across all configs, making the per-config metrics
-    directly comparable.
-    """
 
     def __init__(self, workload: list[str]):
         self._workload = list(workload)

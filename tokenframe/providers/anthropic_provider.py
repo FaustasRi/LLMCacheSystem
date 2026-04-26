@@ -9,12 +9,6 @@ from .base import Provider, Response
 
 
 class AnthropicProvider(Provider):
-    """Provider backed by the real Anthropic API.
-
-    Reads the API key from the ANTHROPIC_API_KEY env var by default.
-    A client instance can also be injected directly — useful for tests
-    that replace the SDK with a mock to avoid real network calls.
-    """
 
     DEFAULT_MODEL = "claude-haiku-4-5-20251001"
     DEFAULT_MAX_TOKENS = 1024
@@ -71,7 +65,6 @@ class AnthropicProvider(Provider):
 
     @staticmethod
     def _split_system(messages: list[dict]) -> tuple[Optional[str], list[dict]]:
-        """Pull system-role messages out — Anthropic expects them as a top-level field, not inside the messages list."""
         system_parts = []
         chat = []
         for m in messages:
@@ -84,7 +77,6 @@ class AnthropicProvider(Provider):
 
     @staticmethod
     def _extract_text(api_resp) -> str:
-        """Concatenate the text blocks from a messages.create response."""
         parts = []
         for block in api_resp.content:
             if getattr(block, "type", None) == "text":

@@ -62,7 +62,7 @@ class TestReporter(unittest.TestCase):
         self.assertTrue(path.exists())
         with path.open() as f:
             rows = list(csv.reader(f))
-        # header + 4 config rows
+
         self.assertEqual(len(rows), 5)
         config_names = [r[0] for r in rows[1:]]
         self.assertEqual(config_names, ["baseline", "exact", "semantic", "full"])
@@ -87,7 +87,7 @@ class TestReporter(unittest.TestCase):
         results = _sample_results()
         path = self._reporter().write_json("casual", results)
         data = json.loads(path.read_text())
-        # Timeline list should round-trip identically.
+
         self.assertEqual(
             data["configs"]["full"]["cumulative_cost_timeline"],
             results["full"].cumulative_cost_timeline,
@@ -120,7 +120,6 @@ class TestReporter(unittest.TestCase):
             self.assertIn(name, md)
 
     def test_summary_markdown_shows_reduction_percentage(self):
-        """'full' config is $0.25 vs baseline $1.00 = 75% reduction."""
         md = self._reporter().summary_markdown("exam_week", _sample_results())
         self.assertIn("75.0%", md)
 

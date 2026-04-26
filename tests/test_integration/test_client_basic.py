@@ -56,7 +56,6 @@ class TestTokenFrameClient(unittest.TestCase):
         self.assertEqual(result.response.model, "claude-opus-4-7")
 
     def test_polymorphism_works_with_any_provider_subclass(self):
-        """The client depends on the Provider interface, not a concrete class."""
         from tokenframe.providers.base import Provider, Response
 
         class CountingProvider(Provider):

@@ -3,14 +3,6 @@ from ..providers.base import Response
 
 
 class MetricsTracker:
-    """Accumulates call counts, token usage, cost, and cache effectiveness.
-
-    `record` is called for API calls (cache misses or cache-less flows).
-    `record_cache_hit` and `record_cache_miss` track cache effectiveness
-    separately — total_calls stays equal to "API calls made", so the
-    difference between calls-with-cache and calls-without-cache is
-    directly visible in the report.
-    """
 
     def __init__(self):
         self._total_calls = 0

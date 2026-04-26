@@ -9,12 +9,6 @@ from .providers.base import Provider, Response
 
 @dataclass(frozen=True)
 class QueryResult:
-    """Return value of TokenFrameClient.query().
-
-    Bundles the provider response with the computed cost and a flag
-    indicating whether the result came from the cache (cost_usd is zero
-    on a hit because no API call was made).
-    """
     response: Response
     cost_usd: float
     cache_hit: bool = False
@@ -25,16 +19,6 @@ class QueryResult:
 
 
 class TokenFrameClient:
-    """Top-level facade over Provider, CostModel, MetricsTracker, and optional CacheStrategy.
-
-    Query flow when a cache is configured:
-      1. Normalize + look up in cache. Hit → record + return immediately.
-      2. Miss → call provider, compute cost, record metrics, store in
-         cache for next time, return.
-
-    Without a cache (cache=None), step 1 is skipped and every query
-    goes to the provider — identical to Phase 1 behaviour.
-    """
 
     def __init__(
         self,

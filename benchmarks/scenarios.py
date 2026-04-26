@@ -3,12 +3,6 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class Scenario:
-    """A benchmark scenario preset.
-
-    zipf_alpha controls how skewed the query popularity is — higher
-    alpha concentrates the workload on the top-ranked questions. The
-    three presets correspond to distinct student-learning modes.
-    """
     name: str
     description_en: str
     description_lt: str

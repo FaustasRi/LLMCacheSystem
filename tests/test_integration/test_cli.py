@@ -101,7 +101,6 @@ class TestCliWithSemantic(unittest.TestCase):
                 os.remove(path)
 
     def _fake_embedder_class(self):
-        """A MagicMock embedder class so --semantic does not download a real model."""
         instance = MagicMock()
         instance.embed.return_value = [0.1, 0.2, 0.3, 0.4]
         cls = MagicMock(return_value=instance)

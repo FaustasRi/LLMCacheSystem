@@ -27,7 +27,7 @@ class TestSQLiteStorage(unittest.TestCase):
     def setUp(self):
         fd, self.path = tempfile.mkstemp(suffix=".sqlite3")
         os.close(fd)
-        os.remove(self.path)  # let Storage create it fresh
+        os.remove(self.path)
 
     def tearDown(self):
         if os.path.exists(self.path):
@@ -85,7 +85,6 @@ class TestSQLiteStorage(unittest.TestCase):
         self.assertAlmostEqual(s.read("q").original_cost_usd, 0.99)
 
     def test_persistence_across_instances(self):
-        """The stopping-check for Phase 2: cache survives process restart."""
         s1 = SQLiteStorage(self.path)
         s1.write("persist-me", _entry(key="persist-me", cost=0.5, hits=2))
         del s1
@@ -110,7 +109,6 @@ class TestSQLiteStorage(unittest.TestCase):
         self.assertEqual(loaded.embedding, [0.1, 0.2, 0.3, 0.4])
 
     def test_entry_without_embedding_round_trips(self):
-        """Exact-match cache entries carry no embedding — null column must survive."""
         s = SQLiteStorage(self.path)
         s.write("q", _entry(key="q"))
         loaded = s.read("q")
@@ -118,7 +116,6 @@ class TestSQLiteStorage(unittest.TestCase):
 
 
 class TestSQLiteStorageMigration(unittest.TestCase):
-    """Phase 2 databases without the embedding column must upgrade cleanly."""
 
     def setUp(self):
         fd, self.path = tempfile.mkstemp(suffix=".sqlite3")
@@ -130,7 +127,6 @@ class TestSQLiteStorageMigration(unittest.TestCase):
             os.remove(self.path)
 
     def _create_legacy_db(self):
-        """Create a DB using the Phase 2 schema (no embedding column)."""
         import sqlite3
         conn = sqlite3.connect(self.path)
         conn.execute("""
@@ -158,7 +154,7 @@ class TestSQLiteStorageMigration(unittest.TestCase):
 
     def test_opening_legacy_db_adds_embedding_column(self):
         self._create_legacy_db()
-        storage = SQLiteStorage(self.path)  # should migrate silently
+        storage = SQLiteStorage(self.path)
         loaded = storage.read("legacy-key")
         self.assertIsNotNone(loaded)
         self.assertIsNone(loaded.embedding)

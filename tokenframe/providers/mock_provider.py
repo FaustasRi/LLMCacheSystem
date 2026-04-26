@@ -4,12 +4,6 @@ from .base import Provider, Response
 
 
 class MockProvider(Provider):
-    """A deterministic, offline Provider used for tests and demos.
-
-    Never contacts a real API. Returns a configured canned response and
-    tracks how many times it was called, which lets tests assert on
-    provider interaction without paying for API calls.
-    """
 
     def __init__(
         self,

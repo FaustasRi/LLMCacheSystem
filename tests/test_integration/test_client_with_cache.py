@@ -30,7 +30,6 @@ class TestClientWithCache(unittest.TestCase):
         self.assertGreater(result.cost_usd, 0.0)
 
     def test_second_identical_query_is_a_hit(self):
-        """Deliverable for Phase 2: repeat query → 1 API call, 1 hit."""
         provider = MockProvider(model=HAIKU, response="answer")
         client = TokenFrameClient(provider=provider, cache=_cache())
 
@@ -56,16 +55,16 @@ class TestClientWithCache(unittest.TestCase):
         provider = MockProvider(model=HAIKU, response="answer")
         client = TokenFrameClient(provider=provider, cache=_cache())
 
-        client.query("q")   # miss → API
-        client.query("q")   # hit
-        client.query("q")   # hit
+        client.query("q")
+        client.query("q")
+        client.query("q")
 
         report = client.metrics.report()
-        self.assertEqual(report["total_calls"], 1)       # only 1 API call
+        self.assertEqual(report["total_calls"], 1)
         self.assertEqual(report["cache_misses"], 1)
         self.assertEqual(report["cache_hits"], 2)
         self.assertAlmostEqual(report["cache_hit_rate"], 2 / 3)
-        # Savings = 2 hits × original_cost_usd of the cached entry
+
         self.assertGreater(report["total_cost_saved_usd"], 0.0)
 
     def test_distinct_queries_each_cost(self):
@@ -79,10 +78,10 @@ class TestClientWithCache(unittest.TestCase):
 
     def test_no_cache_behaves_like_phase_1(self):
         provider = MockProvider(model=HAIKU, response="answer")
-        client = TokenFrameClient(provider=provider)  # no cache
+        client = TokenFrameClient(provider=provider)
         client.query("q")
         client.query("q")
-        # Every query hits the provider; no cache bookkeeping.
+
         self.assertEqual(provider.call_count, 2)
         self.assertEqual(client.metrics.cache_hits, 0)
         self.assertEqual(client.metrics.cache_misses, 0)
@@ -99,7 +98,6 @@ class TestClientWithSQLiteCache(unittest.TestCase):
             os.remove(self.db_path)
 
     def test_persistence_across_client_instances(self):
-        """Phase 2 stopping check: SQLite cache survives process restarts."""
         provider_a = MockProvider(model=HAIKU, response="persistent-answer")
         client_a = TokenFrameClient(
             provider=provider_a,
@@ -108,7 +106,7 @@ class TestClientWithSQLiteCache(unittest.TestCase):
         client_a.query("remember this")
         self.assertEqual(provider_a.call_count, 1)
 
-        # Simulate a restart — brand new client, same DB path.
+
         provider_b = MockProvider(model=HAIKU, response="should-not-be-used")
         client_b = TokenFrameClient(
             provider=provider_b,

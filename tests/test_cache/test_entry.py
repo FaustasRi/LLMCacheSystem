@@ -24,8 +24,8 @@ class TestCacheEntry(unittest.TestCase):
         self.assertEqual(e.hit_count, 2)
 
     def test_register_hit_updates_last_accessed(self):
-        # Pin created_at to a far-past timestamp; register_hit()'s time.time()
-        # will be vastly larger, so the comparison is deterministic.
+
+
         e = CacheEntry(
             query="q", response=_resp(),
             original_cost_usd=0.01, created_at=1000.0,

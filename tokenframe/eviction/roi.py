@@ -7,24 +7,8 @@ from .base import EvictionPolicy
 
 
 class ROIBasedEviction(EvictionPolicy):
-    """Evicts the entry with the lowest return on investment.
 
-    ROI(entry) = (hit_count × original_cost_usd) × exp(-age / half_life)
-
-    Where `age` is the time since the entry's last hit. An unused entry
-    (hit_count == 0) has ROI = 0 and is the first to go. A long-dormant
-    expensive entry decays toward zero as age grows past the half-life.
-
-    To keep newly-inserted entries from being immediately evicted on
-    the very next put (before they've had any chance to accumulate
-    hits), entries younger than `shield_seconds` are excluded from the
-    candidate pool. If the entire pool is within the shield, pick_victim
-    declines to evict by returning None.
-
-    The clock is injectable so tests can control time without sleeping.
-    """
-
-    DEFAULT_HALF_LIFE_SECONDS: float = 7 * 24 * 3600  # 7 days
+    DEFAULT_HALF_LIFE_SECONDS: float = 7 * 24 * 3600
     DEFAULT_SHIELD_SECONDS: float = 60.0
 
     def __init__(
@@ -69,7 +53,7 @@ class ROIBasedEviction(EvictionPolicy):
         value = entry.hit_count * entry.original_cost_usd
         if value == 0:
             return 0.0
-        # hit_count > 0 here → last_hit_at is guaranteed non-None.
+
         age = max(0.0, now - entry.last_hit_at)
         recency = math.exp(-age / self._half_life)
         return value * recency

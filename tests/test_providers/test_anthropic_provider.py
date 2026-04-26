@@ -111,8 +111,8 @@ class TestAnthropicProvider(unittest.TestCase):
         self.assertEqual(resp.text, "part one part two")
 
     def test_missing_api_key_raises(self):
-        # Neutralize .env loading so the test stays deterministic even if
-        # the developer has a populated .env at the project root.
+
+
         saved = os.environ.pop("ANTHROPIC_API_KEY", None)
         try:
             with patch("tokenframe.providers.anthropic_provider.load_env"):

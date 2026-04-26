@@ -11,15 +11,10 @@ from .math_guard import MathKeywordGuard
 from .storage.base import Storage
 
 
-# Sentinel used to distinguish "no guard argument passed" from
-# "explicitly None (disable)". Kept module-private — library users only
-# see the public behaviour: default is enabled, pass guard=None to opt
-# out, pass guard=MathKeywordGuard(...) to customize.
 _DEFAULT_GUARD = object()
 
 
 def _cosine(a: list[float], b: list[float]) -> float:
-    """Cosine similarity of two vectors. Returns 0.0 if either is zero-magnitude."""
     if len(a) != len(b):
         raise ValueError(f"Embedding dimension mismatch: {len(a)} vs {len(b)}")
     dot = 0.0
@@ -35,24 +30,8 @@ def _cosine(a: list[float], b: list[float]) -> float:
 
 
 class SemanticCache(CacheStrategy):
-    """Matches queries by cosine similarity of their embeddings, with an
-    optional math-keyword guard to prevent cross-function collisions.
 
-    On get(), the query is normalized, embedded, and compared against
-    every stored entry's embedding. All entries above the cosine
-    threshold are considered in descending-score order, and the first
-    one that also passes the math-keyword guard is returned. If no
-    guard is configured (guard=None) the best cosine match wins outright.
 
-    Search is a brute-force O(n) scan over all entries — adequate for
-    the workloads this coursework targets. A future V2 could swap in
-    an approximate nearest-neighbour index inside Storage.
-    """
-
-    # Tuned empirically on the multilingual MiniLM model for Lithuanian
-    # math queries. The math-keyword guard runs on top of this floor
-    # to filter the sin/cos class of same-structure collisions that
-    # cosine cannot separate on short inputs.
     DEFAULT_THRESHOLD = 0.75
 
     def __init__(
@@ -75,8 +54,8 @@ class SemanticCache(CacheStrategy):
         self._normalizer = normalizer if normalizer is not None else QueryNormalizer()
         self._threshold = threshold
         self._max_size = max_size
-        # Resolve the guard sentinel: _DEFAULT_GUARD → new MathKeywordGuard;
-        # None → disabled (pure cosine); anything else → caller-provided.
+
+
         if guard is _DEFAULT_GUARD:
             self.guard: Optional[MathKeywordGuard] = MathKeywordGuard()
         else:
@@ -90,9 +69,7 @@ class SemanticCache(CacheStrategy):
         normalized = self._normalizer.normalize(query)
         query_vec = self._embedder.embed(normalized)
 
-        # Collect every candidate above threshold; sort descending so
-        # the guard can veto the best cosine match without losing a
-        # legitimate lower-scored one that shares the same math.
+
         candidates: list[tuple[float, CacheEntry]] = []
         for key in self._storage.list_keys():
             entry = self._storage.read(key)
