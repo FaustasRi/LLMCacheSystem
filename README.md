@@ -138,7 +138,7 @@ print(client.metrics.report())
 python -m unittest discover -s tests -v
 ```
 
-Over 250 tests across unit and integration layers. All tests run offline via `MockProvider` and a test-only `MapEmbedder`, so the suite completes in well under a second and requires no network.
+Over 250 tests across unit and integration layers. After `pip install -e .`, all tests run offline via `MockProvider` and a test-only `MapEmbedder`, so the suite requires no network.
 
 ## Report
 

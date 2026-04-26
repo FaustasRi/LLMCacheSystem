@@ -28,6 +28,7 @@ htmlcov/
 # Project data
 *.sqlite
 *.sqlite3
+*.sqlite3.*
 *.db
 reports/*.csv
 reports/*.json

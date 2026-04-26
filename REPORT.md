@@ -56,7 +56,8 @@ tokenframe --semantic "Kas yra sin 30?"
 python -m benchmarks exam_week --output reports/
 ```
 
-Testai leidžiami be interneto per `MockProvider` ir `MapEmbedder`:
+Po `pip install -e .` testai leidžiami be interneto per `MockProvider` ir
+`MapEmbedder`:
 
 ```bash
 python -m unittest discover -s tests -v
@@ -142,7 +143,11 @@ class CacheEntry:
 
 #### Pagrindinis: Strategy
 
-Strategy šablonas pasirinktas **pagrindiniu**, nes jis natūraliai pritaikomas penkiose skirtingose sistemos vietose:
+Kurso reikalavime leidžiama pasirinkti ir šabloną už pateikto sąrašo ribų,
+jei jis tinka programai. Todėl pagrindiniu šablonu pasirinktas **Strategy**:
+šiame projekte jis natūraliai pritaikomas penkiose skirtingose sistemos
+vietose. Papildomai naudojamas ir iš reikalavimų sąrašo paimtas
+**Factory Method** šablonas, aprašytas žemiau.
 
 | Vieta | Abstrakcija | Konkretūs įgyvendinimai |
 | --- | --- | --- |
@@ -183,7 +188,11 @@ Visos šios konkrečios klasės paklūsta tai pačiai sąsajai, todėl `TokenFra
 
 **Facade.** `TokenFrameClient` paslepia `Provider + CacheStrategy + CostModel + MetricsTracker` sudėtingumą už `query(prompt)`. Naudotojas nemato vidinės struktūros.
 
-**Factory Method.** `benchmarks.configs.make_factories()` grąžina konfigūracijų kūrimo funkcijas, remiantis bendrais ištekliais (tiekėjas, įterpinių skaičiuoklė). Etalono vykdytojas kiekvienam konfigūracijos variantui prašo šviežio kliento.
+**Factory Method.** `benchmarks.configs.make_factories()` grąžina
+konfigūracijų kūrimo funkcijas, remiantis bendrais ištekliais (tiekėjas,
+įterpinių skaičiuoklė). Etalono vykdytojas kiekvienam konfigūracijos
+variantui prašo šviežio kliento. Šis šablonas tiesiogiai atitinka kurso
+pateiktą dizaino šablonų sąrašą.
 
 **Decorator (galimybė).** Esama sąsaja leistų įvynioti `Provider` į papildomus sluoksnius (pvz., `LoggedProvider`, `RetryProvider`), nors tai V2 darbas.
 
