@@ -25,7 +25,6 @@ class TestCacheEntry(unittest.TestCase):
 
     def test_register_hit_updates_last_accessed(self):
 
-
         e = CacheEntry(
             query="q", response=_resp(),
             original_cost_usd=0.01, created_at=1000.0,

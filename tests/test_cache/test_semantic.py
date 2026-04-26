@@ -85,7 +85,7 @@ class TestSemanticCache(unittest.TestCase):
         mapping = {
             "q_target": [1.0, 0.0, 0.0],
             "q_closer": [0.999, 0.0447, 0.0],
-            "q_far":    [0.0, 1.0, 0.0],
+            "q_far": [0.0, 1.0, 0.0],
         }
         c = self._cache(mapping=mapping, threshold=0.9)
         c.put("q_closer", _resp("CLOSE"), cost=0.01)
@@ -128,11 +128,13 @@ class TestSemanticCache(unittest.TestCase):
         mapping = {"q": [1.0, 0.0]}
         c = self._cache(mapping=mapping, threshold=0.9)
 
-
         from tokenframe.cache.entry import CacheEntry
         c._storage.write(
             "no-embed",
-            CacheEntry(query="no-embed", response=_resp(), original_cost_usd=0.01),
+            CacheEntry(
+                query="no-embed",
+                response=_resp(),
+                original_cost_usd=0.01),
         )
 
         c.put("q", _resp("WITH_EMB"), cost=0.01)
@@ -144,7 +146,8 @@ class TestSemanticCache(unittest.TestCase):
 
 class TestSemanticCacheWithGuard(unittest.TestCase):
 
-    def _cache(self, mapping, threshold=0.5, guard=SemanticCache.__init__.__defaults__[-1]):
+    def _cache(self, mapping, threshold=0.5,
+               guard=SemanticCache.__init__.__defaults__[-1]):
         return SemanticCache(
             storage=MemoryStorage(),
             eviction=LRUEviction(),

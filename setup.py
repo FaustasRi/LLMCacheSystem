@@ -6,7 +6,12 @@ setup(
     description="LLM API cost optimization framework",
     author="Faustas",
     python_requires=">=3.10",
-    packages=find_packages(exclude=["tests", "tests.*", "benchmarks", "benchmarks.*"]),
+    packages=find_packages(
+        exclude=[
+            "tests",
+            "tests.*",
+            "benchmarks",
+            "benchmarks.*"]),
     include_package_data=True,
     package_data={
         "tokenframe": ["economics/pricing.json"],

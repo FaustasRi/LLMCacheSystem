@@ -1,20 +1,8 @@
+import argparse
 import logging
 import os
-import warnings
-
-
-os.environ.setdefault("TRANSFORMERS_VERBOSITY", "error")
-os.environ.setdefault("TRANSFORMERS_NO_ADVISORY_WARNINGS", "1")
-os.environ.setdefault("HF_HUB_VERBOSITY", "error")
-os.environ.setdefault("HF_HUB_DISABLE_PROGRESS_BARS", "1")
-warnings.filterwarnings("ignore", category=UserWarning)
-warnings.filterwarnings("ignore", category=FutureWarning)
-
-
-logging.getLogger("huggingface_hub").setLevel(logging.ERROR)
-
-import argparse
 import sys
+import warnings
 
 from .cache.base import CacheStrategy
 from .cache.exact import ExactMatchCache
@@ -31,10 +19,24 @@ from .providers.anthropic_provider import AnthropicProvider
 from .providers.mock_provider import MockProvider
 
 
+os.environ.setdefault("TRANSFORMERS_VERBOSITY", "error")
+os.environ.setdefault("TRANSFORMERS_NO_ADVISORY_WARNINGS", "1")
+os.environ.setdefault("HF_HUB_VERBOSITY", "error")
+os.environ.setdefault("HF_HUB_DISABLE_PROGRESS_BARS", "1")
+warnings.filterwarnings("ignore", category=UserWarning)
+warnings.filterwarnings("ignore", category=FutureWarning)
+
+
+logging.getLogger("huggingface_hub").setLevel(logging.ERROR)
+
+
 def _build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
         prog="tokenframe",
-        description="Query an LLM and report the response along with token usage and cost.",
+        description=(
+            "Query an LLM and report the response along with token usage "
+            "and cost."
+        ),
     )
     p.add_argument("prompt", help="Prompt to send to the model.")
     p.add_argument(
@@ -65,12 +67,15 @@ def _build_parser() -> argparse.ArgumentParser:
         type=float,
         default=SemanticCache.DEFAULT_THRESHOLD,
         help=f"Cosine-similarity threshold for semantic matching "
-             f"(default {SemanticCache.DEFAULT_THRESHOLD}).",
+        f"(default {SemanticCache.DEFAULT_THRESHOLD}).",
     )
     p.add_argument(
         "--cache-db",
         default="./tokenframe_cache.sqlite3",
-        help="SQLite file path for the cache (default: ./tokenframe_cache.sqlite3).",
+        help=(
+            "SQLite file path for the cache "
+            "(default: ./tokenframe_cache.sqlite3)."
+        ),
     )
     p.add_argument(
         "--cache-size",

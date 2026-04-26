@@ -5,20 +5,19 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Union
 
-import matplotlib
-
-
-matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 from .runner import ConfigResult
 
 
+plt.switch_backend("Agg")
+
+
 _CONFIG_COLORS = {
     "baseline": "#999999",
-    "exact":    "#5a9bd4",
+    "exact": "#5a9bd4",
     "semantic": "#3985c6",
-    "full":     "#1f4e79",
+    "full": "#1f4e79",
 }
 
 
@@ -99,7 +98,9 @@ class Reporter:
         fig, ax = plt.subplots(figsize=(7, 4.5))
         bars = ax.bar(names, costs, color=colors)
         ax.set_ylabel("Bendros API sąnaudos (USD)")
-        ax.set_title(f"Scenarijus '{scenario}' — sąnaudos pagal konfigūraciją")
+        ax.set_title(
+            f"Scenarijus '{scenario}' — sąnaudos pagal konfigūraciją"
+        )
         for bar, value in zip(bars, costs):
             ax.text(
                 bar.get_x() + bar.get_width() / 2,
@@ -126,7 +127,10 @@ class Reporter:
         bars = ax.bar(names, rates, color=colors)
         ax.set_ylabel("Talpyklos atitikimo dažnis (%)")
         ax.set_ylim(0, max(100, max(rates) + 10 if rates else 100))
-        ax.set_title(f"Scenarijus '{scenario}' — talpyklos atitikimas pagal konfigūraciją")
+        ax.set_title(
+            f"Scenarijus '{scenario}' — talpyklos atitikimas "
+            "pagal konfigūraciją"
+        )
         for bar, value in zip(bars, rates):
             ax.text(
                 bar.get_x() + bar.get_width() / 2,
@@ -156,7 +160,10 @@ class Reporter:
             )
         ax.set_xlabel("Užklausų skaičius")
         ax.set_ylabel("Sukauptos sąnaudos (USD)")
-        ax.set_title(f"Scenarijus '{scenario}' — sukauptų sąnaudų eiga sesijos metu")
+        ax.set_title(
+            f"Scenarijus '{scenario}' — sukauptų sąnaudų eiga "
+            "sesijos metu"
+        )
         ax.legend(loc="upper left")
         ax.grid(True, alpha=0.3)
         fig.tight_layout()
@@ -172,13 +179,16 @@ class Reporter:
         lines = [
             f"# Scenarijaus '{scenario}' santrauka",
             "",
-            "| Konfigūracija | API skambučiai | Sąnaudos (USD) | Sutaupyta (USD) | Atitikimo dažnis |",
+            "| Konfigūracija | API skambučiai | Sąnaudos (USD) | "
+            "Sutaupyta (USD) | Atitikimo dažnis |",
             "| --- | --- | --- | --- | --- |",
         ]
         for name, r in results.items():
             lines.append(
-                f"| {name} | {r.total_api_calls} | ${r.total_cost_usd:.4f} | "
-                f"${r.total_cost_saved_usd:.4f} | {r.cache_hit_rate * 100:.1f}% |"
+                f"| {name} | {r.total_api_calls} | "
+                f"${r.total_cost_usd:.4f} | "
+                f"${r.total_cost_saved_usd:.4f} | "
+                f"{r.cache_hit_rate * 100:.1f}% |"
             )
 
         baseline = results.get("baseline")

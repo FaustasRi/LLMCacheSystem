@@ -46,7 +46,10 @@ class TestAllowsMatch(unittest.TestCase):
         self.g = MathKeywordGuard()
 
     def test_sin_vs_cos_rejected(self):
-        self.assertFalse(self.g.allows_match("Kas yra sin 30?", "Kas yra cos 30?"))
+        self.assertFalse(
+            self.g.allows_match(
+                "Kas yra sin 30?",
+                "Kas yra cos 30?"))
 
     def test_same_function_variants_allowed(self):
 

@@ -11,7 +11,13 @@ FIXTURE = Path(__file__).parent / "fixtures" / "tiny_questions.json"
 
 class TestQuestion(unittest.TestCase):
     def test_question_is_immutable(self):
-        q = Question(id=1, topic="trig", difficulty="simple", variations=("a",))
+        q = Question(
+            id=1,
+            topic="trig",
+            difficulty="simple",
+            variations=(
+                "a",
+            ))
         with self.assertRaises(Exception):
             q.id = 2
 
@@ -57,14 +63,20 @@ class TestQuestionBank(unittest.TestCase):
         bank = QuestionBank.default()
         self.assertGreaterEqual(len(bank), 1)
         for q in bank:
-            self.assertTrue(q.variations, f"question {q.id} missing variations")
+            self.assertTrue(
+                q.variations, f"question {
+                    q.id} missing variations")
 
     def test_variation_count_preserved(self):
         bank = QuestionBank.from_json(FIXTURE)
         self.assertEqual(len(bank[0].variations), 2)
 
     def test_malformed_json_raises(self):
-        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as f:
+        with tempfile.NamedTemporaryFile(
+            "w",
+            suffix=".json",
+            delete=False,
+        ) as f:
             f.write("{not valid json}")
             path = f.name
         try:

@@ -23,11 +23,12 @@ class QueryNormalizer:
     def __init__(self, fillers: Optional[list[str]] = None):
         phrases = fillers if fillers is not None else LITHUANIAN_FILLERS
 
-
         phrases_sorted = sorted(phrases, key=len, reverse=True)
         if phrases_sorted:
-            pattern = r"\b(?:" + "|".join(re.escape(p) for p in phrases_sorted) + r")\b"
-            self._filler_pattern = re.compile(pattern, re.IGNORECASE | re.UNICODE)
+            pattern = r"\b(?:" + "|".join(re.escape(p)
+                                          for p in phrases_sorted) + r")\b"
+            self._filler_pattern = re.compile(
+                pattern, re.IGNORECASE | re.UNICODE)
         else:
             self._filler_pattern = None
 

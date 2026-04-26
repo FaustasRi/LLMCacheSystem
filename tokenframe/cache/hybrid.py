@@ -33,5 +33,4 @@ class HybridCache(CacheStrategy):
 
     def __len__(self) -> int:
 
-
         return max(len(self._exact), len(self._semantic))

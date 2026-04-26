@@ -34,10 +34,38 @@ def _result(
 
 def _sample_results() -> dict[str, ConfigResult]:
     return {
-        "baseline": _result("baseline", calls=15, cost=1.00, saved=0.00, hits=0, misses=15, hit_rate=0.0),
-        "exact":    _result("exact",    calls=10, cost=0.50, saved=0.35, hits=5, misses=10, hit_rate=0.333),
-        "semantic": _result("semantic", calls=7,  cost=0.35, saved=0.50, hits=8, misses=7,  hit_rate=0.533),
-        "full":     _result("full",     calls=5,  cost=0.25, saved=0.60, hits=10, misses=5, hit_rate=0.667),
+        "baseline": _result(
+            "baseline",
+            calls=15,
+            cost=1.00,
+            saved=0.00,
+            hits=0,
+            misses=15,
+            hit_rate=0.0),
+        "exact": _result(
+            "exact",
+            calls=10,
+            cost=0.50,
+            saved=0.35,
+            hits=5,
+            misses=10,
+            hit_rate=0.333),
+        "semantic": _result(
+            "semantic",
+            calls=7,
+            cost=0.35,
+            saved=0.50,
+            hits=8,
+            misses=7,
+            hit_rate=0.533),
+        "full": _result(
+            "full",
+            calls=5,
+            cost=0.25,
+            saved=0.60,
+            hits=10,
+            misses=5,
+            hit_rate=0.667),
     }
 
 
@@ -65,7 +93,9 @@ class TestReporter(unittest.TestCase):
 
         self.assertEqual(len(rows), 5)
         config_names = [r[0] for r in rows[1:]]
-        self.assertEqual(config_names, ["baseline", "exact", "semantic", "full"])
+        self.assertEqual(
+            config_names, [
+                "baseline", "exact", "semantic", "full"])
 
     def test_write_csv_headers(self):
         path = self._reporter().write_csv("exam_week", _sample_results())
@@ -94,7 +124,10 @@ class TestReporter(unittest.TestCase):
         )
 
     def test_plot_cost_comparison_creates_png(self):
-        path = self._reporter().plot_cost_comparison("exam_week", _sample_results())
+        path = self._reporter().plot_cost_comparison(
+            "exam_week",
+            _sample_results(),
+        )
         self.assertTrue(path.exists())
         self.assertGreater(path.stat().st_size, 0)
 
@@ -104,13 +137,18 @@ class TestReporter(unittest.TestCase):
         self.assertGreater(path.stat().st_size, 0)
 
     def test_plot_cumulative_cost_creates_png(self):
-        path = self._reporter().plot_cumulative_cost("exam_week", _sample_results())
+        path = self._reporter().plot_cumulative_cost(
+            "exam_week",
+            _sample_results(),
+        )
         self.assertTrue(path.exists())
         self.assertGreater(path.stat().st_size, 0)
 
     def test_write_all_produces_five_artifacts(self):
         paths = self._reporter().write_all("mixed", _sample_results())
-        self.assertEqual(set(paths), {"csv", "json", "cost_png", "hit_rate_png", "timeline_png"})
+        self.assertEqual(
+            set(paths), {
+                "csv", "json", "cost_png", "hit_rate_png", "timeline_png"})
         for name, path in paths.items():
             self.assertTrue(path.exists(), msg=name)
 

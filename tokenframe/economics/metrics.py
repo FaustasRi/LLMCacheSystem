@@ -60,7 +60,9 @@ class MetricsTracker:
             "total_cost_usd": self._total_cost,
             "total_input_tokens": self._total_input_tokens,
             "total_output_tokens": self._total_output_tokens,
-            "by_model": {m: dict(stats) for m, stats in self._by_model.items()},
+            "by_model": {
+                m: dict(stats) for m,
+                stats in self._by_model.items()},
             "cache_hits": self._cache_hits,
             "cache_misses": self._cache_misses,
             "cache_hit_rate": hit_rate,

@@ -1,17 +1,8 @@
 import argparse
+import logging
 import os
 import sys
 import warnings
-
-
-os.environ.setdefault("TRANSFORMERS_VERBOSITY", "error")
-os.environ.setdefault("TRANSFORMERS_NO_ADVISORY_WARNINGS", "1")
-os.environ.setdefault("HF_HUB_VERBOSITY", "error")
-os.environ.setdefault("HF_HUB_DISABLE_PROGRESS_BARS", "1")
-warnings.filterwarnings("ignore", category=UserWarning)
-warnings.filterwarnings("ignore", category=FutureWarning)
-import logging
-logging.getLogger("huggingface_hub").setLevel(logging.ERROR)
 
 from .configs import make_factories, mock_provider_factory
 from .reporter import Reporter
@@ -21,10 +12,21 @@ from .studybuddy.question_bank import QuestionBank
 from .studybuddy.simulator import StudentSimulator
 
 
+os.environ.setdefault("TRANSFORMERS_VERBOSITY", "error")
+os.environ.setdefault("TRANSFORMERS_NO_ADVISORY_WARNINGS", "1")
+os.environ.setdefault("HF_HUB_VERBOSITY", "error")
+os.environ.setdefault("HF_HUB_DISABLE_PROGRESS_BARS", "1")
+warnings.filterwarnings("ignore", category=UserWarning)
+warnings.filterwarnings("ignore", category=FutureWarning)
+logging.getLogger("huggingface_hub").setLevel(logging.ERROR)
+
+
 def _build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
         prog="python -m benchmarks",
-        description="Run StudyBuddy benchmarks against the four TokenFrame configs.",
+        description=(
+            "Run StudyBuddy benchmarks against the four TokenFrame configs."
+        ),
     )
     p.add_argument(
         "scenario",
@@ -48,8 +50,12 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Directory for CSV, JSON, PNG artifacts (default: reports).",
     )
     p.add_argument(
-        "--real-api", action="store_true",
-        help="Use the real Anthropic API instead of MockProvider. Costs money.",
+        "--real-api",
+        action="store_true",
+        help=(
+            "Use the real Anthropic API instead of MockProvider. "
+            "Costs money."
+        ),
     )
     p.add_argument(
         "--configs", nargs="+",
@@ -64,7 +70,11 @@ def main(argv=None) -> int:
     args = _build_parser().parse_args(argv)
 
     scenario = SCENARIOS[args.scenario]
-    n_queries = args.n_queries if args.n_queries is not None else scenario.n_queries
+    n_queries = (
+        args.n_queries
+        if args.n_queries is not None
+        else scenario.n_queries
+    )
 
     bank = QuestionBank.default()
     simulator = StudentSimulator(
@@ -81,7 +91,8 @@ def main(argv=None) -> int:
         f"cache_size={args.cache_size}"
     )
     print(f"  bank={len(bank)} base questions")
-    print(f"  provider={'real Anthropic API' if args.real_api else 'MockProvider'}")
+    provider_name = "real Anthropic API" if args.real_api else "MockProvider"
+    print(f"  provider={provider_name}")
     print()
 
     if args.real_api:

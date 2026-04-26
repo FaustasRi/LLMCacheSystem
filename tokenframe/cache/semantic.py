@@ -31,7 +31,6 @@ def _cosine(a: list[float], b: list[float]) -> float:
 
 class SemanticCache(CacheStrategy):
 
-
     DEFAULT_THRESHOLD = 0.75
 
     def __init__(
@@ -45,16 +44,18 @@ class SemanticCache(CacheStrategy):
         guard=_DEFAULT_GUARD,
     ):
         if not 0.0 <= threshold <= 1.0:
-            raise ValueError(f"threshold must be in [0.0, 1.0] (got {threshold})")
+            raise ValueError(
+                f"threshold must be in [0.0, 1.0] (got {threshold})")
         if max_size < 1:
             raise ValueError(f"max_size must be at least 1 (got {max_size})")
         self._storage = storage
         self._eviction = eviction
         self._embedder = embedder
-        self._normalizer = normalizer if normalizer is not None else QueryNormalizer()
+        self._normalizer = (
+            normalizer if normalizer is not None else QueryNormalizer()
+        )
         self._threshold = threshold
         self._max_size = max_size
-
 
         if guard is _DEFAULT_GUARD:
             self.guard: Optional[MathKeywordGuard] = MathKeywordGuard()
@@ -69,7 +70,6 @@ class SemanticCache(CacheStrategy):
         normalized = self._normalizer.normalize(query)
         query_vec = self._embedder.embed(normalized)
 
-
         candidates: list[tuple[float, CacheEntry]] = []
         for key in self._storage.list_keys():
             entry = self._storage.read(key)
@@ -81,7 +81,8 @@ class SemanticCache(CacheStrategy):
         candidates.sort(key=lambda sc: sc[0], reverse=True)
 
         for _, entry in candidates:
-            if self.guard is None or self.guard.allows_match(normalized, entry.query):
+            if self.guard is None or self.guard.allows_match(
+                    normalized, entry.query):
                 entry.register_hit()
                 self._storage.write(entry.query, entry)
                 return entry

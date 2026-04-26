@@ -83,7 +83,9 @@ class TestHybridCache(unittest.TestCase):
 class TestHybridCacheGuard(unittest.TestCase):
 
     def _hybrid(self, mapping, threshold=0.5, guard_kw=None):
-        exact = ExactMatchCache(storage=MemoryStorage(), eviction=LRUEviction())
+        exact = ExactMatchCache(
+            storage=MemoryStorage(),
+            eviction=LRUEviction())
         semantic = SemanticCache(
             storage=MemoryStorage(),
             eviction=LRUEviction(),

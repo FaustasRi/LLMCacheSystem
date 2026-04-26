@@ -57,7 +57,8 @@ class TestStudentSimulator(unittest.TestCase):
         sim = StudentSimulator(bank=bank, zipf_alpha=4.0, seed=0)
         queries = sim.generate(1000)
         first_question_variations = set(bank[0].variations)
-        fraction_top = sum(1 for q in queries if q in first_question_variations) / 1000
+        fraction_top = sum(
+            1 for q in queries if q in first_question_variations) / 1000
         self.assertGreater(fraction_top, 0.9)
 
     def test_low_alpha_spreads_across_bank(self):

@@ -30,10 +30,16 @@ class TokenFrameClient:
     ):
         self._provider = provider
         self._cache = cache
-        self._cost_model = cost_model if cost_model is not None else CostModel()
+        self._cost_model = (
+            cost_model if cost_model is not None else CostModel()
+        )
         self._metrics = metrics if metrics is not None else MetricsTracker()
 
-    def query(self, prompt: str, *, model: Optional[str] = None) -> QueryResult:
+    def query(
+            self,
+            prompt: str,
+            *,
+            model: Optional[str] = None) -> QueryResult:
         if self._cache is not None:
             entry = self._cache.get(prompt)
             if entry is not None:

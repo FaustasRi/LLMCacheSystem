@@ -64,7 +64,8 @@ class AnthropicProvider(Provider):
         )
 
     @staticmethod
-    def _split_system(messages: list[dict]) -> tuple[Optional[str], list[dict]]:
+    def _split_system(messages: list[dict]
+                      ) -> tuple[Optional[str], list[dict]]:
         system_parts = []
         chat = []
         for m in messages:

@@ -21,7 +21,9 @@ class ExactMatchCache(CacheStrategy):
             raise ValueError(f"max_size must be at least 1 (got {max_size})")
         self._storage = storage
         self._eviction = eviction
-        self._normalizer = normalizer if normalizer is not None else QueryNormalizer()
+        self._normalizer = (
+            normalizer if normalizer is not None else QueryNormalizer()
+        )
         self._max_size = max_size
 
     def get(self, query: str) -> Optional[CacheEntry]:
@@ -30,7 +32,6 @@ class ExactMatchCache(CacheStrategy):
         if entry is None:
             return None
         entry.register_hit()
-
 
         self._storage.write(key, entry)
         return entry

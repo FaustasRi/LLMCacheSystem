@@ -14,7 +14,8 @@ SCENARIOS: dict[str, Scenario] = {
     "exam_week": Scenario(
         name="exam_week",
         description_en=(
-            "Students cramming before an exam — heavy repetition of top questions."
+            "Students cramming before an exam — heavy repetition of "
+            "top questions."
         ),
         description_lt=(
             "Studentai kartoja medžiagą prieš egzaminą — daug pasikartojimų."
@@ -28,7 +29,8 @@ SCENARIOS: dict[str, Scenario] = {
             "Mixed-practice learning — moderate repetition across topics."
         ),
         description_lt=(
-            "Mišrus mokymasis — vidutinis pasikartojimų kiekis skirtingomis temomis."
+            "Mišrus mokymasis — vidutinis pasikartojimų kiekis "
+            "skirtingomis temomis."
         ),
         zipf_alpha=1.5,
         n_queries=500,

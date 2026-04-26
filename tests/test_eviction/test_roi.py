@@ -34,6 +34,7 @@ def _entry(
 class _Clock:
     def __init__(self, now: float):
         self.now = now
+
     def __call__(self) -> float:
         return self.now
 
@@ -48,25 +49,42 @@ class TestROIFormula(unittest.TestCase):
     def test_more_hits_give_higher_roi(self):
         policy = ROIBasedEviction(clock=_Clock(1000.0))
         one_hit = _entry(cost=0.10, created_at=0.0, hits=1, last_hit_at=999.0)
-        five_hits = _entry(cost=0.10, created_at=0.0, hits=5, last_hit_at=999.0)
-        self.assertLess(policy._roi(one_hit, 1000.0), policy._roi(five_hits, 1000.0))
+        five_hits = _entry(
+            cost=0.10,
+            created_at=0.0,
+            hits=5,
+            last_hit_at=999.0)
+        self.assertLess(
+            policy._roi(
+                one_hit, 1000.0), policy._roi(
+                five_hits, 1000.0))
 
     def test_more_expensive_original_call_gives_higher_roi(self):
         policy = ROIBasedEviction(clock=_Clock(1000.0))
         cheap = _entry(cost=0.01, created_at=0.0, hits=1, last_hit_at=999.0)
         pricey = _entry(cost=1.00, created_at=0.0, hits=1, last_hit_at=999.0)
-        self.assertLess(policy._roi(cheap, 1000.0), policy._roi(pricey, 1000.0))
+        self.assertLess(
+            policy._roi(
+                cheap, 1000.0), policy._roi(
+                pricey, 1000.0))
 
     def test_recent_hit_beats_stale_hit(self):
         half_life = 1000.0
-        policy = ROIBasedEviction(half_life_seconds=half_life, clock=_Clock(10_000.0))
+        policy = ROIBasedEviction(
+            half_life_seconds=half_life,
+            clock=_Clock(10_000.0))
         recent = _entry(cost=0.10, created_at=0.0, hits=1, last_hit_at=9_900.0)
         stale = _entry(cost=0.10, created_at=0.0, hits=1, last_hit_at=1_000.0)
-        self.assertGreater(policy._roi(recent, 10_000.0), policy._roi(stale, 10_000.0))
+        self.assertGreater(
+            policy._roi(
+                recent, 10_000.0), policy._roi(
+                stale, 10_000.0))
 
     def test_recency_at_exactly_one_half_life_is_one_half(self):
         half_life = 100.0
-        policy = ROIBasedEviction(half_life_seconds=half_life, clock=_Clock(200.0))
+        policy = ROIBasedEviction(
+            half_life_seconds=half_life,
+            clock=_Clock(200.0))
 
         e = _entry(cost=1.0, created_at=0.0, hits=1, last_hit_at=100.0)
         roi = policy._roi(e, now=200.0)
@@ -84,8 +102,18 @@ class TestPickVictim(unittest.TestCase):
             shield_seconds=0.0,
             clock=_Clock(10_000.0),
         )
-        valuable = _entry("v", cost=1.00, created_at=0.0, hits=5, last_hit_at=9_900.0)
-        cheap = _entry("c", cost=0.01, created_at=0.0, hits=1, last_hit_at=5_000.0)
+        valuable = _entry(
+            "v",
+            cost=1.00,
+            created_at=0.0,
+            hits=5,
+            last_hit_at=9_900.0)
+        cheap = _entry(
+            "c",
+            cost=0.01,
+            created_at=0.0,
+            hits=1,
+            last_hit_at=5_000.0)
         unused = _entry("u", cost=0.50, created_at=0.0)
         victim = policy.pick_victim([valuable, cheap, unused])
         self.assertIs(victim, unused)
@@ -93,7 +121,12 @@ class TestPickVictim(unittest.TestCase):
     def test_zero_roi_entry_evicted_before_nonzero_even_if_older(self):
         policy = ROIBasedEviction(shield_seconds=0.0, clock=_Clock(10_000.0))
         unused_old = _entry("old_unused", cost=1.00, created_at=0.0)
-        hit_newer = _entry("hit_new", cost=0.01, created_at=5_000.0, hits=1, last_hit_at=9_000.0)
+        hit_newer = _entry(
+            "hit_new",
+            cost=0.01,
+            created_at=5_000.0,
+            hits=1,
+            last_hit_at=9_000.0)
         victim = policy.pick_victim([hit_newer, unused_old])
         self.assertIs(victim, unused_old)
 
@@ -103,7 +136,12 @@ class TestPickVictim(unittest.TestCase):
             clock=_Clock(1000.0),
         )
         fresh = _entry("fresh", cost=0.10, created_at=990.0)
-        old = _entry("old", cost=0.10, created_at=0.0, hits=3, last_hit_at=500.0)
+        old = _entry(
+            "old",
+            cost=0.10,
+            created_at=0.0,
+            hits=3,
+            last_hit_at=500.0)
         victim = policy.pick_victim([fresh, old])
         self.assertIs(victim, old)
 
@@ -145,7 +183,6 @@ class TestValidation(unittest.TestCase):
         self.assertEqual(policy.shield_seconds, 60.0)
 
     def test_injected_clock_used(self):
-
 
         policy = ROIBasedEviction(clock=_Clock(500.0))
         e = _entry(cost=0.10, created_at=0.0, hits=2, last_hit_at=500.0)

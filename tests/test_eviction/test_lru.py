@@ -9,7 +9,11 @@ from tokenframe.providers.base import Response
 def _entry(key, created_at=None):
     return CacheEntry(
         query=key,
-        response=Response(text="t", model="m", input_tokens=1, output_tokens=1),
+        response=Response(
+            text="t",
+            model="m",
+            input_tokens=1,
+            output_tokens=1),
         original_cost_usd=0.01,
         created_at=created_at,
     )
@@ -33,7 +37,6 @@ class TestLRUEviction(unittest.TestCase):
         self.assertIs(LRUEviction().pick_victim([c, a, b]), a)
 
     def test_access_updates_recency(self):
-
 
         a = _entry("a", created_at=1000.0)
         b = _entry("b", created_at=2000.0)

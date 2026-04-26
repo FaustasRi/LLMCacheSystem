@@ -55,7 +55,9 @@ class TestAnthropicProvider(unittest.TestCase):
         )
 
     def test_model_override_passed_through(self):
-        client = _client_returning(_FakeApiResponse("hi", "claude-opus-4-7", 1, 1))
+        client = _client_returning(
+            _FakeApiResponse(
+                "hi", "claude-opus-4-7", 1, 1))
         provider = AnthropicProvider(client=client)
         provider.send(
             [{"role": "user", "content": "q"}],
@@ -67,7 +69,9 @@ class TestAnthropicProvider(unittest.TestCase):
         )
 
     def test_response_parses_text_and_usage(self):
-        client = _client_returning(_FakeApiResponse("hello world", "m", 42, 100))
+        client = _client_returning(
+            _FakeApiResponse(
+                "hello world", "m", 42, 100))
         provider = AnthropicProvider(client=client)
         resp = provider.send([{"role": "user", "content": "q"}])
         self.assertEqual(resp.text, "hello world")
@@ -111,7 +115,6 @@ class TestAnthropicProvider(unittest.TestCase):
         self.assertEqual(resp.text, "part one part two")
 
     def test_missing_api_key_raises(self):
-
 
         saved = os.environ.pop("ANTHROPIC_API_KEY", None)
         try:

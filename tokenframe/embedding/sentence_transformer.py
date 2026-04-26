@@ -15,7 +15,6 @@ class SentenceTransformerEmbedder(Embedder):
     ):
         if model is None:
 
-
             from sentence_transformers import SentenceTransformer
             model = SentenceTransformer(model_name)
         self._model = model

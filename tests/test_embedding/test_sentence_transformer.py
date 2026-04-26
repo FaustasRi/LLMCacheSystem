@@ -2,7 +2,9 @@ import unittest
 from unittest.mock import MagicMock
 
 from tokenframe.embedding.base import Embedder
-from tokenframe.embedding.sentence_transformer import SentenceTransformerEmbedder
+from tokenframe.embedding.sentence_transformer import (
+    SentenceTransformerEmbedder,
+)
 
 
 class TestSentenceTransformerEmbedder(unittest.TestCase):
@@ -23,7 +25,8 @@ class TestSentenceTransformerEmbedder(unittest.TestCase):
         self.assertIsInstance(e, Embedder)
 
     def test_embed_returns_list_of_floats(self):
-        e = SentenceTransformerEmbedder(model=self._fake_model([0.1, 0.2, 0.3]))
+        e = SentenceTransformerEmbedder(
+            model=self._fake_model([0.1, 0.2, 0.3]))
         vec = e.embed("hello")
         self.assertEqual(vec, [0.1, 0.2, 0.3])
         self.assertIsInstance(vec, list)

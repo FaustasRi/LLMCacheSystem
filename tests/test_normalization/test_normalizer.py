@@ -8,7 +8,9 @@ class TestQueryNormalizer(unittest.TestCase):
         self.n = QueryNormalizer()
 
     def test_lowercases(self):
-        self.assertEqual(self.n.normalize("Kas yra SIN(30)"), "kas yra sin(30)")
+        self.assertEqual(
+            self.n.normalize("Kas yra SIN(30)"),
+            "kas yra sin(30)")
 
     def test_collapses_whitespace(self):
         self.assertEqual(
@@ -58,7 +60,6 @@ class TestQueryNormalizer(unittest.TestCase):
         )
 
     def test_longer_filler_beats_shorter(self):
-
 
         self.assertEqual(
             self.n.normalize("gal galėtumėte padėti"),

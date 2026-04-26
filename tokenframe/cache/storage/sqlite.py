@@ -33,7 +33,6 @@ class SQLiteStorage(Storage):
         with self._open() as conn:
             conn.execute(self._SCHEMA)
 
-
             try:
                 conn.execute(
                     "ALTER TABLE cache_entries ADD COLUMN embedding TEXT"
@@ -92,7 +91,8 @@ class SQLiteStorage(Storage):
 
     def delete(self, key: str) -> bool:
         with self._open() as conn:
-            cur = conn.execute("DELETE FROM cache_entries WHERE key = ?", (key,))
+            cur = conn.execute(
+                "DELETE FROM cache_entries WHERE key = ?", (key,))
             return cur.rowcount > 0
 
     def list_keys(self) -> list[str]:

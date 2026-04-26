@@ -67,7 +67,6 @@ class TestExactMatchCache(unittest.TestCase):
     def test_eviction_triggers_when_full(self):
         c = _make_cache(max_size=2)
 
-
         clock = iter([1000.0 + i for i in range(100)])
 
         with patch("tokenframe.cache.entry.time.time",
@@ -77,7 +76,6 @@ class TestExactMatchCache(unittest.TestCase):
 
             c.get("b")
             c.put("c", _resp(), cost=0.01)
-
 
         self.assertIsNone(c.get("a"))
         self.assertIsNotNone(c.get("b"))

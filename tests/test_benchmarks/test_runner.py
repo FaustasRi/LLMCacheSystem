@@ -24,7 +24,9 @@ class TestBenchmarkRunner(unittest.TestCase):
     def test_runs_each_config_once(self):
         r = self._runner(["q1", "q1", "q2"])
         results = r.run(self._factories())
-        self.assertEqual(set(results), {"baseline", "exact", "semantic", "full"})
+        self.assertEqual(
+            set(results), {
+                "baseline", "exact", "semantic", "full"})
         for name, result in results.items():
             self.assertIsInstance(result, ConfigResult, msg=name)
             self.assertEqual(result.total_queries, 3, msg=name)

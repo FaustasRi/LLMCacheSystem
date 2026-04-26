@@ -106,7 +106,6 @@ class TestClientWithSQLiteCache(unittest.TestCase):
         client_a.query("remember this")
         self.assertEqual(provider_a.call_count, 1)
 
-
         provider_b = MockProvider(model=HAIKU, response="should-not-be-used")
         client_b = TokenFrameClient(
             provider=provider_b,

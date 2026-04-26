@@ -57,7 +57,6 @@ class MathKeywordGuard:
     def __init__(self, stems: Optional[dict[str, str]] = None):
         self._stems = stems if stems is not None else dict(_DEFAULT_MATH_STEMS)
 
-
         self._sorted_stems = sorted(self._stems.keys(), key=len, reverse=True)
 
     def extract(self, text: str) -> set[str]:

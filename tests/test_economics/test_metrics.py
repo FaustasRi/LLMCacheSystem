@@ -34,7 +34,12 @@ class TestMetricsTracker(unittest.TestCase):
 
     def test_records_a_single_call(self):
         m = MetricsTracker()
-        m.record(_resp(model="haiku", input_tokens=10, output_tokens=20), cost=0.001)
+        m.record(
+            _resp(
+                model="haiku",
+                input_tokens=10,
+                output_tokens=20),
+            cost=0.001)
         r = m.report()
         self.assertEqual(r["total_calls"], 1)
         self.assertAlmostEqual(r["total_cost_usd"], 0.001)
@@ -53,9 +58,24 @@ class TestMetricsTracker(unittest.TestCase):
 
     def test_tracks_by_model(self):
         m = MetricsTracker()
-        m.record(_resp(model="haiku", input_tokens=10, output_tokens=20), cost=0.001)
-        m.record(_resp(model="haiku", input_tokens=10, output_tokens=20), cost=0.001)
-        m.record(_resp(model="opus", input_tokens=10, output_tokens=20), cost=0.01)
+        m.record(
+            _resp(
+                model="haiku",
+                input_tokens=10,
+                output_tokens=20),
+            cost=0.001)
+        m.record(
+            _resp(
+                model="haiku",
+                input_tokens=10,
+                output_tokens=20),
+            cost=0.001)
+        m.record(
+            _resp(
+                model="opus",
+                input_tokens=10,
+                output_tokens=20),
+            cost=0.01)
         r = m.report()
         self.assertEqual(r["by_model"]["haiku"]["calls"], 2)
         self.assertAlmostEqual(r["by_model"]["haiku"]["cost"], 0.002)
